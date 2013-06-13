@@ -32,6 +32,9 @@ print total_number_of_frames
 width = int(cap.get(3))
 height = int(cap.get(4))
 
+
+
+
 #print frame
 #width = frame.shape[0]
 #height = frame.shape[1]
@@ -61,10 +64,16 @@ first_upper_right_point1 = tuple([half_width,0])
 first_upper_right_point2 = tuple([width,half_height])
 
 _,frame2 = cap.read()
+
+
+# convert to hsv and find range of colors
+#hsv = cv2.cvtColor(frame_cross,cv2.COLOR_BGR2HSV)
+#thresh = cv2.inRange(hsv,np.array((250, 250, 250)), np.array((255,255,255)))
+#cv2.imshow('blur',frame_cross)
 print half_width
 print half_height
 frame_number = cap.get(CV_CAP_PROP_POS_FRAMES)
-while(frame_number < 250):
+while(frame_number < 1550):
     frame_number = cap.get(CV_CAP_PROP_POS_FRAMES)
     # read the frames
     _,frame = cap.read()
@@ -132,7 +141,7 @@ while(frame_number < 250):
         mid_point = [summe[0]/number_of_points,summe[1]/number_of_points]
         mid_point = tuple([int(mid_point[0]),int(mid_point[1])])
         cv2.circle(frame2,mid_point, 1, cv.CV_RGB(255,0,0))
-
+        cv2.circle(frame,mid_point, 1, cv.CV_RGB(255,0,0))
     #print contours
     # finding centroids of best_cnt and draw a circle there
     #M = cv2.moments(best_cnt)
