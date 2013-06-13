@@ -116,7 +116,9 @@ while(frame_number < 250):
     end = tuple([half_width,height])
     cv2.line(frame,start,end,cv.CV_RGB(255,0,255))
     cv2.line(frame,start,end,cv.CV_RGB(255,0,255))
-    cv2.line(frame,first_upper_left_75_point1,first_upper_left_75_point2,cv.CV_RGB(255,0,255))
+    cv2.rectangle(frame,first_upper_left_75_point1,first_upper_left_75_point2,cv.CV_RGB(255,0,255))
+    cv2.rectangle(frame,first_upper_left_50_point1,first_upper_left_50_point2,cv.CV_RGB(255,0,255))
+    cv2.rectangle(frame,first_upper_left_25_point1,first_upper_left_25_point2,cv.CV_RGB(255,0,255))
     cv2.line(frame,first_upper_right_point1,first_upper_right_point2,cv.CV_RGB(255,0,255))
 
     for cnt in contours2:
