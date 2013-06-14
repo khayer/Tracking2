@@ -23,7 +23,7 @@ CV_CAP_PROP_MODE = 9
 #CV_CAP_PROP_RECTIFICATION
 
 # create video capture
-cap = cv2.VideoCapture("/Users/hayer/Desktop/Anand/openfields/071211_Batch1-openfield.m4v")
+cap = cv2.VideoCapture("/Users/hayer/Desktop/Anand/openfields/100411_batch2-openfield.m4v")
 ##if (!cap.isOpened()):  // check if we succeeded
  ##   return -1;
 print cap.isOpened()
@@ -58,24 +58,44 @@ perc_50_height = int((half_height-half_height*0.35)/2)
 perc_25_width = int((half_width-half_width*0.15)/2)
 perc_25_height = int((half_height-half_height*0.15)/2)
 
+correction = 35
+correction_height = 5 # old
+correction_height_inner = 10
+correction_height_outer = 20
 upper_left_point1 = tuple([0,0])
 upper_left_point2 = tuple([half_width,half_height])
-upper_left_75_point1 = tuple([perc_75_width+15,perc_75_height+5])
-upper_left_75_point2 = tuple([half_width-perc_75_width+15,half_height-perc_75_height-5])
-upper_left_50_point1 = tuple([perc_50_width+15,perc_50_height+5])
-upper_left_50_point2 = tuple([half_width-perc_50_width+15,half_height-perc_50_height-5])
-upper_left_25_point1 = tuple([perc_25_width+15,perc_25_height+5])
-upper_left_25_point2 = tuple([half_width-perc_25_width+15,half_height-perc_25_height-5])
+upper_left_75_point1 = tuple([perc_75_width+correction,perc_75_height+correction_height])
+upper_left_75_point2 = tuple([half_width-perc_75_width+correction,half_height-perc_75_height+correction_height_outer])
+upper_left_50_point1 = tuple([perc_50_width+correction,perc_50_height+correction_height])
+upper_left_50_point2 = tuple([half_width-perc_50_width+correction,half_height-perc_50_height+correction_height_outer])
+upper_left_25_point1 = tuple([perc_25_width+correction,perc_25_height+correction_height])
+upper_left_25_point2 = tuple([half_width-perc_25_width+correction,half_height-perc_25_height+correction_height_outer])
 upper_right_point1 = tuple([half_width,0])
 upper_right_point2 = tuple([width,half_height])
-upper_right_75_point1 = tuple([half_width+perc_75_width-15,perc_75_height+5])
-upper_right_75_point2 = tuple([width-perc_75_width-15,half_height-perc_75_height-5])
-upper_right_50_point1 = tuple([half_width+perc_50_width-15,perc_50_height+5])
-upper_right_50_point2 = tuple([width-perc_50_width-15,half_height-perc_50_height-5])
-upper_right_25_point1 = tuple([half_width+perc_25_width-15,perc_25_height+5])
-upper_right_25_point2 = tuple([width-perc_25_width-15,half_height-perc_25_height-5])
+upper_right_75_point1 = tuple([half_width+perc_75_width-correction,perc_75_height+correction_height])
+upper_right_75_point2 = tuple([width-perc_75_width-correction,half_height-perc_75_height+correction_height_outer])
+upper_right_50_point1 = tuple([half_width+perc_50_width-correction,perc_50_height+correction_height])
+upper_right_50_point2 = tuple([width-perc_50_width-correction,half_height-perc_50_height+correction_height_outer])
+upper_right_25_point1 = tuple([half_width+perc_25_width-correction,perc_25_height+correction_height])
+upper_right_25_point2 = tuple([width-perc_25_width-correction,half_height-perc_25_height+correction_height_outer])
 
+lower_left_point1 = tuple([0,half_height])
+lower_left_point2 = tuple([half_width,height])
+lower_left_75_point1 = tuple([perc_75_width+correction,half_height+perc_75_height+correction_height])
+lower_left_75_point2 = tuple([half_width-perc_75_width+correction,height-perc_75_height-correction_height_outer])
+lower_left_50_point1 = tuple([perc_50_width+correction,half_height+perc_50_height+correction_height])
+lower_left_50_point2 = tuple([half_width-perc_50_width+correction,height-perc_50_height-correction_height_outer])
+lower_left_25_point1 = tuple([perc_25_width+correction,half_height+perc_25_height+correction_height])
+lower_left_25_point2 = tuple([half_width-perc_25_width+correction,height-perc_25_height-correction_height_outer])
 
+lower_right_point1 = tuple([half_width,half_height])
+lower_right_point2 = tuple([width,height])
+lower_right_75_point1 = tuple([half_width+perc_75_width-correction,half_height+perc_75_height-correction_height_inner])
+lower_right_75_point2 = tuple([width-perc_75_width-correction,height-perc_75_height-correction_height_outer])
+lower_right_50_point1 = tuple([half_width+perc_50_width-correction,half_height+perc_50_height-correction_height_inner])
+lower_right_50_point2 = tuple([width-perc_50_width-correction,height-perc_50_height-correction_height_outer])
+lower_right_25_point1 = tuple([half_width+perc_25_width-correction,half_height+perc_25_height-correction_height_inner])
+lower_right_25_point2 = tuple([width-perc_25_width-correction,height-perc_25_height-correction_height_outer])
 _,frame2 = cap.read()
 
 x = []
@@ -146,7 +166,12 @@ while(frame_number < 5000):
     cv2.rectangle(frame,upper_right_75_point1,upper_right_75_point2,cv.CV_RGB(255,0,0))
     cv2.rectangle(frame,upper_right_50_point1,upper_right_50_point2,cv.CV_RGB(255,0,0))
     cv2.rectangle(frame,upper_right_25_point1,upper_right_25_point2,cv.CV_RGB(255,0,0))
-
+    cv2.rectangle(frame,lower_left_75_point1,lower_left_75_point2,cv.CV_RGB(0,0,255))
+    cv2.rectangle(frame,lower_left_50_point1,lower_left_50_point2,cv.CV_RGB(0,0,255))
+    cv2.rectangle(frame,lower_left_25_point1,lower_left_25_point2,cv.CV_RGB(0,0,255))
+    cv2.rectangle(frame,lower_right_75_point1,lower_right_75_point2,cv.CV_RGB(0,255,0))
+    cv2.rectangle(frame,lower_right_50_point1,lower_right_50_point2,cv.CV_RGB(0,255,0))
+    cv2.rectangle(frame,lower_right_25_point1,lower_right_25_point2,cv.CV_RGB(0,255,0))
     for cnt in contours2:
         summe = [0,0]
         number_of_points = 0
