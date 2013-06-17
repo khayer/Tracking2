@@ -54,14 +54,16 @@ perc_50_height = int((half_height-half_height*0.35)/2)
 perc_25_width = int((half_width-half_width*0.15)/2)
 perc_25_height = int((half_height-half_height*0.15)/2)
 
+bout_threshold = 22
 threshold = 5
 correction = 35
 correction_height = 5 # old
 correction_height_inner = 10
 correction_height_outer = 20
 
-
 last_upper_left = None
+upper_left_i = None
+f = 0
 upper_left = upper_left_75 = upper_left_50 = upper_left_25 = 0
 dist_upper_left = dist_upper_left_75 = dist_upper_left_50 = dist_upper_left_25 = 0
 upper_left_point1 = tuple([0,0])
@@ -207,7 +209,13 @@ while(frame_number < 100):
             last_upper_left = last_upper_left or mp
             distance = dist(last_upper_left,mp)
             if distance > threshold:
+                upper_left_i = 0 or upper_left_i
+                upper_left_i = upper_left_i + 1
                 cv2.circle(frame,mp, 5, cv.CV_RGB(255,0,0))
+                if upper_left_i == bout_threshold:
+                    upper_left_num_bout = upper_left_num_bout + 1
+                if upper_left_i >= bout_threshold:
+                    upper_left_frame_bout = upper_left_frame_bout + 1
             else:
                 distance = 0
 
@@ -296,6 +304,8 @@ heatmap, xedges, yedges = np.histogram2d(x, y, bins=50)
 extent = [xedges[0], xedges[-1], yedges[0], yedges[-1]]
 #
 plt.clf()
+print "Results: ----------------------------"
+
 print "upper_left:\t" + str(upper_left)
 print "upper_left_25:\t" + str(upper_left_25)
 print "upper_left_50:\t" + str(upper_left_50)
@@ -305,6 +315,9 @@ print "dist_upper_left:\t" + str(dist_upper_left)
 print "dist_upper_left_25:\t" + str(dist_upper_left_25)
 print "dist_upper_left_50:\t" + str(dist_upper_left_50)
 print "dist_upper_left_75:\t" + str(dist_upper_left_75)
+
+print "upper_left_num_bout:\t" + upper_left_num_bout
+print "frames per bout:\t" + upper_left_frame_bout
 
 print "upper_right:\t" + str(upper_right)
 print "upper_right_25:\t" + str(upper_right_25)
