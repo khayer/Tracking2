@@ -54,58 +54,75 @@ perc_50_height = int((half_height-half_height*0.35)/2)
 perc_25_width = int((half_width-half_width*0.15)/2)
 perc_25_height = int((half_height-half_height*0.15)/2)
 
-bout_threshold = 22
-threshold = 5
-correction = 35
-correction_height = 5 # old
-correction_height_inner = 10
-correction_height_outer = 20
+bout_threshold = 5
+threshold = 3
+correction_width_inner = 20
+correction_width_outer = 40
+correction_height_inner = 15
+correction_height_outer = 25
 
 last_upper_left = None
 upper_left_i = None
-f = 0
+upper_left_num_bout = 0
+upper_left_frame_bout = 0
 upper_left = upper_left_75 = upper_left_50 = upper_left_25 = 0
 dist_upper_left = dist_upper_left_75 = dist_upper_left_50 = dist_upper_left_25 = 0
 upper_left_point1 = tuple([0,0])
 upper_left_point2 = tuple([half_width,half_height])
-upper_left_75_point1 = tuple([perc_75_width+correction,perc_75_height+correction_height])
-upper_left_75_point2 = tuple([half_width-perc_75_width+correction,half_height-perc_75_height+correction_height_outer])
-upper_left_50_point1 = tuple([perc_50_width+correction,perc_50_height+correction_height])
-upper_left_50_point2 = tuple([half_width-perc_50_width+correction,half_height-perc_50_height+correction_height_outer])
-upper_left_25_point1 = tuple([perc_25_width+correction,perc_25_height+correction_height])
-upper_left_25_point2 = tuple([half_width-perc_25_width+correction,half_height-perc_25_height+correction_height_outer])
+upper_left_75_point1 = tuple([perc_75_width+ correction_width_outer,perc_75_height+correction_height_outer])
+upper_left_75_point2 = tuple([half_width-perc_75_width+ correction_width_inner,half_height-perc_75_height+correction_height_inner])
+upper_left_50_point1 = tuple([perc_50_width+ correction_width_outer,perc_50_height+correction_height_outer])
+upper_left_50_point2 = tuple([half_width-perc_50_width+ correction_width_inner,half_height-perc_50_height+correction_height_inner])
+upper_left_25_point1 = tuple([perc_25_width+ correction_width_outer,perc_25_height+correction_height_outer])
+upper_left_25_point2 = tuple([half_width-perc_25_width+ correction_width_inner,half_height-perc_25_height+correction_height_inner])
 
 last_upper_right = None
+upper_right_i = None
+upper_right_num_bout = 0
+upper_right_frame_bout = 0
 upper_right = upper_right_75 = upper_right_50 = upper_right_25 = 0
 dist_upper_right = dist_upper_right_75 = dist_upper_right_50 = dist_upper_right_25 = 0
 upper_right_point1 = tuple([half_width,0])
 upper_right_point2 = tuple([width,half_height])
-upper_right_75_point1 = tuple([half_width+perc_75_width-correction,perc_75_height+correction_height])
-upper_right_75_point2 = tuple([width-perc_75_width-correction,half_height-perc_75_height+correction_height_outer])
-upper_right_50_point1 = tuple([half_width+perc_50_width-correction,perc_50_height+correction_height])
-upper_right_50_point2 = tuple([width-perc_50_width-correction,half_height-perc_50_height+correction_height_outer])
-upper_right_25_point1 = tuple([half_width+perc_25_width-correction,perc_25_height+correction_height])
-upper_right_25_point2 = tuple([width-perc_25_width-correction,half_height-perc_25_height+correction_height_outer])
+upper_right_75_point1 = tuple([half_width+perc_75_width- correction_width_inner,perc_75_height+correction_height_outer])
+upper_right_75_point2 = tuple([width-perc_75_width- correction_width_outer,half_height-perc_75_height+correction_height_inner])
+upper_right_50_point1 = tuple([half_width+perc_50_width- correction_width_inner,perc_50_height+correction_height_outer])
+upper_right_50_point2 = tuple([width-perc_50_width- correction_width_outer,half_height-perc_50_height+correction_height_inner])
+upper_right_25_point1 = tuple([half_width+perc_25_width- correction_width_inner,perc_25_height+correction_height_outer])
+upper_right_25_point2 = tuple([width-perc_25_width- correction_width_outer,half_height-perc_25_height+correction_height_inner])
 
+last_lower_left = None
+lower_left_i = None
+lower_left_num_bout = 0
+lower_left_frame_bout = 0
 lower_left = lower_left_75 = lower_left_50 = lower_left_25 = 0
+dist_lower_left = dist_lower_left_75 = dist_lower_left_50 = dist_lower_left_25 = 0
 lower_left_point1 = tuple([0,half_height])
 lower_left_point2 = tuple([half_width,height])
-lower_left_75_point1 = tuple([perc_75_width+correction,half_height+perc_75_height+correction_height])
-lower_left_75_point2 = tuple([half_width-perc_75_width+correction,height-perc_75_height-correction_height_outer])
-lower_left_50_point1 = tuple([perc_50_width+correction,half_height+perc_50_height+correction_height])
-lower_left_50_point2 = tuple([half_width-perc_50_width+correction,height-perc_50_height-correction_height_outer])
-lower_left_25_point1 = tuple([perc_25_width+correction,half_height+perc_25_height+correction_height])
-lower_left_25_point2 = tuple([half_width-perc_25_width+correction,height-perc_25_height-correction_height_outer])
+lower_left_75_point1 = tuple([perc_75_width+ correction_width_outer,half_height+perc_75_height-correction_height_inner])
+lower_left_75_point2 = tuple([half_width-perc_75_width+ correction_width_inner,height-perc_75_height-correction_height_outer])
+lower_left_50_point1 = tuple([perc_50_width+ correction_width_outer,half_height+perc_50_height-correction_height_inner])
+lower_left_50_point2 = tuple([half_width-perc_50_width+ correction_width_inner,height-perc_50_height-correction_height_outer])
+lower_left_25_point1 = tuple([perc_25_width+ correction_width_outer,half_height+perc_25_height-correction_height_inner])
+lower_left_25_point2 = tuple([half_width-perc_25_width+ correction_width_inner,height-perc_25_height-correction_height_outer])
 
+
+last_lower_right = None
+lower_right_i = None
+lower_right_num_bout = 0
+lower_right_frame_bout = 0
 lower_right = lower_right_75 = lower_right_50 = lower_right_25 = 0
+dist_lower_right = dist_lower_right_75 = dist_lower_right_50 = dist_lower_right_25 = 0
 lower_right_point1 = tuple([half_width,half_height])
 lower_right_point2 = tuple([width,height])
-lower_right_75_point1 = tuple([half_width+perc_75_width-correction,half_height+perc_75_height-correction_height_inner])
-lower_right_75_point2 = tuple([width-perc_75_width-correction,height-perc_75_height-correction_height_outer])
-lower_right_50_point1 = tuple([half_width+perc_50_width-correction,half_height+perc_50_height-correction_height_inner])
-lower_right_50_point2 = tuple([width-perc_50_width-correction,height-perc_50_height-correction_height_outer])
-lower_right_25_point1 = tuple([half_width+perc_25_width-correction,half_height+perc_25_height-correction_height_inner])
-lower_right_25_point2 = tuple([width-perc_25_width-correction,height-perc_25_height-correction_height_outer])
+lower_right_75_point1 = tuple([half_width+perc_75_width- correction_width_inner,half_height+perc_75_height-correction_height_inner])
+lower_right_75_point2 = tuple([width-perc_75_width- correction_width_outer ,height-perc_75_height-correction_height_outer])
+lower_right_50_point1 = tuple([half_width+perc_50_width-correction_width_inner,half_height+perc_50_height-correction_height_inner])
+lower_right_50_point2 = tuple([width-perc_50_width-correction_width_outer,height-perc_50_height-correction_height_outer])
+lower_right_25_point1 = tuple([half_width+perc_25_width-correction_width_inner,half_height+perc_25_height-correction_height_inner])
+lower_right_25_point2 = tuple([width-perc_25_width-correction_width_outer,height-perc_25_height-correction_height_outer])
+
+
 _,frame2 = cap.read()
 
 x = []
@@ -119,7 +136,7 @@ mid_points = []
 print half_width
 print half_height
 frame_number = cap.get(CV_CAP_PROP_POS_FRAMES)
-while(frame_number < 100):
+while(frame_number < 500):
     frame_number = cap.get(CV_CAP_PROP_POS_FRAMES)
     # read the frames
     _,frame = cap.read()
@@ -127,10 +144,10 @@ while(frame_number < 100):
 
     # smooth it
     #cv2.imshow('before',frame)
-    frame = cv2.blur(frame,(17,17))
+    frame3 = cv2.blur(frame,(17,17))
     #cv2.imshow('blur',frame)
     # convert to hsv and find range of colors
-    hsv = cv2.cvtColor(frame,cv2.COLOR_BGR2HSV)
+    hsv = cv2.cvtColor(frame3,cv2.COLOR_BGR2HSV)
     thresh = cv2.inRange(hsv,np.array((0, 0, 1)), np.array((0, 0, 4)))
 
     #res = cv2.morphologyEx(thresh,cv2.MORPH_OPEN,element)
@@ -148,7 +165,7 @@ while(frame_number < 100):
     contours,hierarchy = cv2.findContours(thresh,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
 
     # finding contour with maximum area and store it as best_cnt
-    _,color_image = cap.read()
+
     max_area = 0
     contours2 = contours
     i = 0
@@ -202,22 +219,25 @@ while(frame_number < 100):
         cv2.circle(frame2,mid_point, 1, cv.CV_RGB(255,0,0))
         cv2.circle(frame,mid_point, 1, cv.CV_RGB(255,0,0))
 
+    left_upper_bool = left_lower_bool = right_upper_bool = right_lower_bool = 1
     for mp in mid_points:
 
         if comp_tuple(mp,upper_left_point1,upper_left_point2):
             #var1 = 4 if var1 is None else var1
+            left_upper_bool = 0
             last_upper_left = last_upper_left or mp
             distance = dist(last_upper_left,mp)
             if distance > threshold:
                 upper_left_i = 0 or upper_left_i
                 upper_left_i = upper_left_i + 1
-                cv2.circle(frame,mp, 5, cv.CV_RGB(255,0,0))
                 if upper_left_i == bout_threshold:
                     upper_left_num_bout = upper_left_num_bout + 1
                 if upper_left_i >= bout_threshold:
+                    cv2.circle(frame,mp, 5, cv.CV_RGB(255,0,0))
                     upper_left_frame_bout = upper_left_frame_bout + 1
             else:
                 distance = 0
+                upper_left_i = 0
 
             if comp_tuple(mp,upper_left_25_point1,upper_left_25_point2):
                 dist_upper_left_25 = dist_upper_left_25 + distance
@@ -234,12 +254,20 @@ while(frame_number < 100):
             last_upper_left = mp
 
         if comp_tuple(mp,upper_right_point1,upper_right_point2):
+            right_upper_bool = 0
             last_upper_right = last_upper_right or mp
             distance = dist(last_upper_right,mp)
             if distance > threshold:
-                cv2.circle(frame,mp, 5, cv.CV_RGB(0,0,255))
+                upper_right_i = 0 or upper_right_i
+                upper_right_i = upper_right_i + 1
+                if upper_right_i == bout_threshold:
+                    upper_right_num_bout = upper_right_num_bout + 1
+                if upper_right_i >= bout_threshold:
+                    cv2.circle(frame,mp, 5, cv.CV_RGB(255,0,0))
+                    upper_right_frame_bout = upper_right_frame_bout + 1
             else:
                 distance = 0
+                upper_right_i = 0
             if comp_tuple(mp,upper_right_25_point1,upper_right_25_point2):
                 dist_upper_right_25 = dist_upper_right_25 + distance
                 upper_right_25 = upper_right_25 + 1
@@ -255,28 +283,70 @@ while(frame_number < 100):
             last_upper_right = mp
 
         if comp_tuple(mp,lower_left_point1,lower_left_point2):
-            cv2.circle(frame,mp, 5, cv.CV_RGB(0,255,0))
+            left_lower_bool = 0
+            last_lower_left = last_lower_left or mp
+            distance = dist(last_lower_left,mp)
+            if distance > threshold:
+                lower_left_i = 0 or lower_left_i
+                lower_left_i = lower_left_i + 1
+                if lower_left_i == bout_threshold:
+                    lower_left_num_bout = lower_left_num_bout + 1
+                if lower_left_i >= bout_threshold:
+                    cv2.circle(frame,mp, 5, cv.CV_RGB(0,255,0))
+                    lower_left_frame_bout = lower_left_frame_bout + 1
+            else:
+                distance = 0
+                lower_left_i = 0
             if comp_tuple(mp,lower_left_25_point1,lower_left_25_point2):
+                dist_lower_left_25 = dist_lower_left_25 + distance
                 lower_left_25 = lower_left_25 + 1
             elif comp_tuple(mp,lower_left_50_point1,lower_left_50_point2):
+                dist_lower_left_50 = dist_lower_left_50 + distance
                 lower_left_50 = lower_left_50 + 1
             elif comp_tuple(mp,lower_left_75_point1,lower_left_75_point2):
+                dist_lower_left_75 = dist_lower_left_75 + distance
                 lower_left_75 = lower_left_75 + 1
             else:
                 lower_left = lower_left + 1
+                dist_lower_left = dist_lower_left + distance
+            last_lower_left = mp
 
         if comp_tuple(mp,lower_right_point1,lower_right_point2):
-            cv2.circle(frame,mp, 5, cv.CV_RGB(0,255,255))
+            right_lower_bool = 0
+            last_lower_right = last_lower_right or mp
+            distance = dist(last_lower_right,mp)
+            if distance > threshold:
+                lower_right_i = 0 or lower_right_i
+                lower_right_i = lower_right_i + 1
+                if lower_right_i == bout_threshold:
+                    lower_right_num_bout = lower_right_num_bout + 1
+                if lower_right_i >= bout_threshold:
+                    cv2.circle(frame,mp, 5, cv.CV_RGB(255,255,0))
+                    lower_right_frame_bout = lower_right_frame_bout + 1
+            else:
+                distance = 0
+                lower_right_i = 0
             if comp_tuple(mp,lower_right_25_point1,lower_right_25_point2):
+                dist_lower_right_25 = dist_lower_right_25 + distance
                 lower_right_25 = lower_right_25 + 1
             elif comp_tuple(mp,lower_right_50_point1,lower_right_50_point2):
+                dist_lower_right_50 = dist_lower_right_50 + distance
                 lower_right_50 = lower_right_50 + 1
             elif comp_tuple(mp,lower_right_75_point1,lower_right_75_point2):
+                dist_lower_right_75 = dist_lower_right_75 + distance
                 lower_right_75 = lower_right_75 + 1
             else:
                 lower_right = lower_right + 1
-
-
+                dist_lower_right = dist_lower_right + distance
+            last_lower_right = mp
+    if left_lower_bool == 1:
+        lower_left = lower_left + 1
+    if right_lower_bool == 1:
+        lower_right = lower_right + 1
+    if left_upper_bool == 1:
+        upper_left = upper_left + 1
+    if right_upper_bool == 1:
+        upper_right = upper_right + 1
     #print contours
     # finding centroids of best_cnt and draw a circle there
     #M = cv2.moments(best_cnt)
@@ -306,38 +376,117 @@ extent = [xedges[0], xedges[-1], yedges[0], yedges[-1]]
 plt.clf()
 print "Results: ----------------------------"
 
-print "upper_left:\t" + str(upper_left)
-print "upper_left_25:\t" + str(upper_left_25)
-print "upper_left_50:\t" + str(upper_left_50)
-print "upper_left_75:\t" + str(upper_left_75)
+print "upper_left:\t" + str(upper_left / frame_per_sec)
+print "upper_left_25:\t" + str(upper_left_25 / frame_per_sec)
+print "upper_left_50:\t" + str(upper_left_50 / frame_per_sec)
+print "upper_left_75:\t" + str(upper_left_75  / frame_per_sec)
 
 print "dist_upper_left:\t" + str(dist_upper_left)
 print "dist_upper_left_25:\t" + str(dist_upper_left_25)
 print "dist_upper_left_50:\t" + str(dist_upper_left_50)
 print "dist_upper_left_75:\t" + str(dist_upper_left_75)
 
-print "upper_left_num_bout:\t" + upper_left_num_bout
-print "frames per bout:\t" + upper_left_frame_bout
+speed_upper_left = speed_upper_left_25 = speed_upper_left_50 = speed_upper_left_75 = 0
+if upper_left / frame_per_sec > 0:
+    speed_upper_left = dist_upper_left/ ( upper_left /frame_per_sec)
+if upper_left_25 / frame_per_sec > 0:
+    speed_upper_left_25 = dist_upper_left_25/ (upper_left_25/frame_per_sec)
+if upper_left_50 / frame_per_sec > 0:
+    speed_upper_left_50 = dist_upper_left_50/ (upper_left_50/frame_per_sec )
+if upper_left_75 / frame_per_sec > 0:
+    speed_upper_left_75 = dist_upper_left_75/ (upper_left_75/ frame_per_sec )
+print "speed_upper_left:\t" + str(speed_upper_left)
+print "speed_upper_left_25:\t" + str(speed_upper_left_25)
+print "speed_upper_left_50:\t" + str(speed_upper_left_50)
+print "speed_upper_left_75:\t" + str(speed_upper_left_75)
 
-print "upper_right:\t" + str(upper_right)
-print "upper_right_25:\t" + str(upper_right_25)
-print "upper_right_50:\t" + str(upper_right_50)
-print "upper_right_75:\t" + str(upper_right_75)
+print "upper_left_num_bout:\t" + str(upper_left_num_bout)
+print "seconds in bout:\t" + str(upper_left_frame_bout / frame_per_sec)
+
+print "----------------------------"
+print "upper_right:\t" + str(upper_right / frame_per_sec)
+print "upper_right_25:\t" + str(upper_right_25 / frame_per_sec)
+print "upper_right_50:\t" + str(upper_right_50 / frame_per_sec)
+print "upper_right_75:\t" + str(upper_right_75 / frame_per_sec)
 
 print "dist_upper_right:\t" + str(dist_upper_right)
 print "dist_upper_right_25:\t" + str(dist_upper_right_25)
 print "dist_upper_right_50:\t" + str(dist_upper_right_50)
 print "dist_upper_right_75:\t" + str(dist_upper_right_75)
 
-print "lower_left:\t" + str(lower_left)
-print "lower_left_25:\t" + str(lower_left_25)
-print "lower_left_50:\t" + str(lower_left_50)
-print "lower_left_75:\t" + str(lower_left_75)
+speed_upper_right = speed_upper_right_25 = speed_upper_right_50 = speed_upper_right_75 = 0
+if upper_right / frame_per_sec > 0:
+    speed_upper_right = dist_upper_right/ ( upper_right /frame_per_sec)
+if upper_right_25 / frame_per_sec > 0:
+    speed_upper_right_25 = dist_upper_right_25/ (upper_right_25/frame_per_sec)
+if upper_right_50 / frame_per_sec > 0:
+    speed_upper_right_50 = dist_upper_right_50/ (upper_right_50/frame_per_sec )
+if upper_right_75 / frame_per_sec > 0:
+    speed_upper_right_75 = dist_upper_right_75/ (upper_right_75/ frame_per_sec )
+print "speed_upper_right:\t" + str(speed_upper_right)
+print "speed_upper_right_25:\t" + str(speed_upper_right_25)
+print "speed_upper_right_50:\t" + str(speed_upper_right_50)
+print "speed_upper_right_75:\t" + str(speed_upper_right_75)
 
-print "lower_right:\t" + str(lower_right)
-print "lower_right_25:\t" + str(lower_right_25)
-print "lower_right_50:\t" + str(lower_right_50)
-print "lower_right_75:\t" + str(lower_right_75)
+print "upper_right_num_bout:\t" + str(upper_right_num_bout)
+print "seconds in bout:\t" + str(upper_right_frame_bout / frame_per_sec)
+
+print "----------------------------"
+print "lower_left:\t" + str(lower_left / frame_per_sec)
+print "lower_left_25:\t" + str(lower_left_25 / frame_per_sec)
+print "lower_left_50:\t" + str(lower_left_50 / frame_per_sec)
+print "lower_left_75:\t" + str(lower_left_75 / frame_per_sec)
+
+print "dist_lower_left:\t" + str(dist_lower_left)
+print "dist_lower_left_25:\t" + str(dist_lower_left_25)
+print "dist_lower_left_50:\t" + str(dist_lower_left_50)
+print "dist_lower_left_75:\t" + str(dist_lower_left_75)
+
+speed_lower_left = speed_lower_left_25 = speed_lower_left_50 = speed_lower_left_75 = 0
+if lower_left / frame_per_sec > 0:
+    speed_lower_left = dist_lower_left/ ( lower_left /frame_per_sec)
+if lower_left_25 / frame_per_sec > 0:
+    speed_lower_left_25 = dist_lower_left_25/ (lower_left_25/frame_per_sec)
+if lower_left_50 / frame_per_sec > 0:
+    speed_lower_left_50 = dist_lower_left_50/ (lower_left_50/frame_per_sec )
+if lower_left_75 / frame_per_sec > 0:
+    speed_lower_left_75 = dist_lower_left_75/ (lower_left_75/ frame_per_sec )
+print "speed_lower_left:\t" + str(speed_lower_left)
+print "speed_lower_left_25:\t" + str(speed_lower_left_25)
+print "speed_lower_left_50:\t" + str(speed_lower_left_50)
+print "speed_lower_left_75:\t" + str(speed_lower_left_75)
+
+
+print "lower_left_num_bout:\t" + str(lower_left_num_bout)
+print "seconds in bout:\t" + str(lower_left_frame_bout / frame_per_sec)
+
+print "----------------------------"
+print "lower_right:\t" + str(lower_right/ frame_per_sec)
+print "lower_right_25:\t" + str(lower_right_25 / frame_per_sec)
+print "lower_right_50:\t" + str(lower_right_50/ frame_per_sec)
+print "lower_right_75:\t" + str(lower_right_75/ frame_per_sec)
+
+print "dist_lower_right:\t" + str(dist_lower_right)
+print "dist_lower_right_25:\t" + str(dist_lower_right_25)
+print "dist_lower_right_50:\t" + str(dist_lower_right_50)
+print "dist_lower_right_75:\t" + str(dist_lower_right_75)
+
+speed_lower_right = speed_lower_right_25 = speed_lower_right_50 = speed_lower_right_75 = 0
+if lower_right / frame_per_sec > 0:
+    speed_lower_right = dist_lower_right/ ( lower_right /frame_per_sec)
+if lower_right_25 / frame_per_sec > 0:
+    speed_lower_right_25 = dist_lower_right_25/ (lower_right_25/frame_per_sec)
+if lower_right_50 / frame_per_sec > 0:
+    speed_lower_right_50 = dist_lower_right_50/ (lower_right_50/frame_per_sec )
+if lower_right_75 / frame_per_sec > 0:
+    speed_lower_right_75 = dist_lower_right_75/ (lower_right_75/ frame_per_sec )
+print "speed_lower_right:\t" + str(speed_lower_right)
+print "speed_lower_right_25:\t" + str(speed_lower_right_25)
+print "speed_lower_right_50:\t" + str(speed_lower_right_50)
+print "speed_lower_right_75:\t" + str(speed_lower_right_75)
+
+print "lower_right_num_bout:\t" + str(lower_right_num_bout)
+print "seconds in bout:\t" + str(lower_right_frame_bout / frame_per_sec)
 
 plt.imshow(heatmap, extent=extent)
 cb = plt.colorbar()
