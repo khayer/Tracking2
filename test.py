@@ -1,6 +1,7 @@
 import cv2,cv
 import numpy as np
 import matplotlib.pyplot as plt
+import math
 
 CV_CAP_PROP_POS_MSEC = 0
 CV_CAP_PROP_POS_FRAMES = 1
@@ -30,23 +31,18 @@ print cap.isOpened()
 
 total_number_of_frames = cap.get(CV_CAP_PROP_FRAME_COUNT)
 print total_number_of_frames
+frame_per_sec = cap.get(CV_CAP_PROP_FPS)
+print frame_per_sec
 width = int(cap.get(3))
 height = int(cap.get(4))
 
+def comp_tuple(mp,pt1,pt2):
+    return mp[0] >= pt1[0] and mp[0] <= pt2[0] and mp[1] >= pt1[1] and mp[1] <= pt2[1]
 
-#import heatmap
-#import random
-#
-#hm = heatmap.Heatmap()
-#pts = [(random.uniform(-77.012, -77.050), random.uniform(38.888, 38.910)) for x in range(100)]
-#hm.heatmap(pts)
-#hm.saveKML("data.kml")
-
-#print frame
-#width = frame.shape[0]
-#height = frame.shape[1]
-#print width
-#print height
+def dist(pt1,pt2):
+    xd = pt2[0] - pt1[0]
+    yd = pt2[1] - pt1[1]
+    return math.sqrt(xd*xd + yd*yd)
 
 half_width = int(width/2)
 half_height = int(height/2)
@@ -58,10 +54,16 @@ perc_50_height = int((half_height-half_height*0.35)/2)
 perc_25_width = int((half_width-half_width*0.15)/2)
 perc_25_height = int((half_height-half_height*0.15)/2)
 
+threshold = 5
 correction = 35
 correction_height = 5 # old
 correction_height_inner = 10
 correction_height_outer = 20
+
+
+last_upper_left = None
+upper_left = upper_left_75 = upper_left_50 = upper_left_25 = 0
+dist_upper_left = dist_upper_left_75 = dist_upper_left_50 = dist_upper_left_25 = 0
 upper_left_point1 = tuple([0,0])
 upper_left_point2 = tuple([half_width,half_height])
 upper_left_75_point1 = tuple([perc_75_width+correction,perc_75_height+correction_height])
@@ -70,6 +72,10 @@ upper_left_50_point1 = tuple([perc_50_width+correction,perc_50_height+correction
 upper_left_50_point2 = tuple([half_width-perc_50_width+correction,half_height-perc_50_height+correction_height_outer])
 upper_left_25_point1 = tuple([perc_25_width+correction,perc_25_height+correction_height])
 upper_left_25_point2 = tuple([half_width-perc_25_width+correction,half_height-perc_25_height+correction_height_outer])
+
+last_upper_right = None
+upper_right = upper_right_75 = upper_right_50 = upper_right_25 = 0
+dist_upper_right = dist_upper_right_75 = dist_upper_right_50 = dist_upper_right_25 = 0
 upper_right_point1 = tuple([half_width,0])
 upper_right_point2 = tuple([width,half_height])
 upper_right_75_point1 = tuple([half_width+perc_75_width-correction,perc_75_height+correction_height])
@@ -79,6 +85,7 @@ upper_right_50_point2 = tuple([width-perc_50_width-correction,half_height-perc_5
 upper_right_25_point1 = tuple([half_width+perc_25_width-correction,perc_25_height+correction_height])
 upper_right_25_point2 = tuple([width-perc_25_width-correction,half_height-perc_25_height+correction_height_outer])
 
+lower_left = lower_left_75 = lower_left_50 = lower_left_25 = 0
 lower_left_point1 = tuple([0,half_height])
 lower_left_point2 = tuple([half_width,height])
 lower_left_75_point1 = tuple([perc_75_width+correction,half_height+perc_75_height+correction_height])
@@ -88,6 +95,7 @@ lower_left_50_point2 = tuple([half_width-perc_50_width+correction,height-perc_50
 lower_left_25_point1 = tuple([perc_25_width+correction,half_height+perc_25_height+correction_height])
 lower_left_25_point2 = tuple([half_width-perc_25_width+correction,height-perc_25_height-correction_height_outer])
 
+lower_right = lower_right_75 = lower_right_50 = lower_right_25 = 0
 lower_right_point1 = tuple([half_width,half_height])
 lower_right_point2 = tuple([width,height])
 lower_right_75_point1 = tuple([half_width+perc_75_width-correction,half_height+perc_75_height-correction_height_inner])
@@ -100,6 +108,7 @@ _,frame2 = cap.read()
 
 x = []
 y = []
+mid_points = []
 
 # convert to hsv and find range of colors
 #hsv = cv2.cvtColor(frame_cross,cv2.COLOR_BGR2HSV)
@@ -108,7 +117,7 @@ y = []
 print half_width
 print half_height
 frame_number = cap.get(CV_CAP_PROP_POS_FRAMES)
-while(frame_number < 5000):
+while(frame_number < 100):
     frame_number = cap.get(CV_CAP_PROP_POS_FRAMES)
     # read the frames
     _,frame = cap.read()
@@ -160,6 +169,7 @@ while(frame_number < 5000):
     end = tuple([half_width,height])
     cv2.line(frame,start,end,cv.CV_RGB(255,0,255))
     cv2.line(frame,start,end,cv.CV_RGB(255,0,255))
+
     cv2.rectangle(frame,upper_left_75_point1,upper_left_75_point2,cv.CV_RGB(255,0,255))
     cv2.rectangle(frame,upper_left_50_point1,upper_left_50_point2,cv.CV_RGB(255,0,255))
     cv2.rectangle(frame,upper_left_25_point1,upper_left_25_point2,cv.CV_RGB(255,0,255))
@@ -172,6 +182,8 @@ while(frame_number < 5000):
     cv2.rectangle(frame,lower_right_75_point1,lower_right_75_point2,cv.CV_RGB(0,255,0))
     cv2.rectangle(frame,lower_right_50_point1,lower_right_50_point2,cv.CV_RGB(0,255,0))
     cv2.rectangle(frame,lower_right_25_point1,lower_right_25_point2,cv.CV_RGB(0,255,0))
+
+    mid_points = []
     for cnt in contours2:
         summe = [0,0]
         number_of_points = 0
@@ -184,8 +196,78 @@ while(frame_number < 5000):
         x.append(mid_point[0])
         y.append(mid_point[1])
         mid_point = tuple([int(mid_point[0]),int(mid_point[1])])
+        mid_points.append(mid_point)
         cv2.circle(frame2,mid_point, 1, cv.CV_RGB(255,0,0))
         cv2.circle(frame,mid_point, 1, cv.CV_RGB(255,0,0))
+
+    for mp in mid_points:
+
+        if comp_tuple(mp,upper_left_point1,upper_left_point2):
+            #var1 = 4 if var1 is None else var1
+            last_upper_left = last_upper_left or mp
+            distance = dist(last_upper_left,mp)
+            if distance > threshold:
+                cv2.circle(frame,mp, 5, cv.CV_RGB(255,0,0))
+            else:
+                distance = 0
+
+            if comp_tuple(mp,upper_left_25_point1,upper_left_25_point2):
+                dist_upper_left_25 = dist_upper_left_25 + distance
+                upper_left_25 = upper_left_25 + 1
+            elif comp_tuple(mp,upper_left_50_point1,upper_left_50_point2):
+                upper_left_50 = upper_left_50 + 1
+                dist_upper_left_50 = dist_upper_left_50 + distance
+            elif comp_tuple(mp,upper_left_75_point1,upper_left_75_point2):
+                upper_left_75 = upper_left_75 + 1
+                dist_upper_left_75 = dist_upper_left_75 + distance
+            else:
+                upper_left = upper_left + 1
+                dist_upper_left = dist_upper_left + distance
+            last_upper_left = mp
+
+        if comp_tuple(mp,upper_right_point1,upper_right_point2):
+            last_upper_right = last_upper_right or mp
+            distance = dist(last_upper_right,mp)
+            if distance > threshold:
+                cv2.circle(frame,mp, 5, cv.CV_RGB(0,0,255))
+            else:
+                distance = 0
+            if comp_tuple(mp,upper_right_25_point1,upper_right_25_point2):
+                dist_upper_right_25 = dist_upper_right_25 + distance
+                upper_right_25 = upper_right_25 + 1
+            elif comp_tuple(mp,upper_right_50_point1,upper_right_50_point2):
+                upper_right_50 = upper_right_50 + 1
+                dist_upper_right_50 = dist_upper_right_50 + distance
+            elif comp_tuple(mp,upper_right_75_point1,upper_right_75_point2):
+                upper_right_75 = upper_right_75 + 1
+                dist_upper_right_75 = dist_upper_right_75 + distance
+            else:
+                upper_right = upper_right + 1
+                dist_upper_right = dist_upper_right + distance
+            last_upper_right = mp
+
+        if comp_tuple(mp,lower_left_point1,lower_left_point2):
+            cv2.circle(frame,mp, 5, cv.CV_RGB(0,255,0))
+            if comp_tuple(mp,lower_left_25_point1,lower_left_25_point2):
+                lower_left_25 = lower_left_25 + 1
+            elif comp_tuple(mp,lower_left_50_point1,lower_left_50_point2):
+                lower_left_50 = lower_left_50 + 1
+            elif comp_tuple(mp,lower_left_75_point1,lower_left_75_point2):
+                lower_left_75 = lower_left_75 + 1
+            else:
+                lower_left = lower_left + 1
+
+        if comp_tuple(mp,lower_right_point1,lower_right_point2):
+            cv2.circle(frame,mp, 5, cv.CV_RGB(0,255,255))
+            if comp_tuple(mp,lower_right_25_point1,lower_right_25_point2):
+                lower_right_25 = lower_right_25 + 1
+            elif comp_tuple(mp,lower_right_50_point1,lower_right_50_point2):
+                lower_right_50 = lower_right_50 + 1
+            elif comp_tuple(mp,lower_right_75_point1,lower_right_75_point2):
+                lower_right_75 = lower_right_75 + 1
+            else:
+                lower_right = lower_right + 1
+
 
     #print contours
     # finding centroids of best_cnt and draw a circle there
@@ -214,6 +296,35 @@ heatmap, xedges, yedges = np.histogram2d(x, y, bins=50)
 extent = [xedges[0], xedges[-1], yedges[0], yedges[-1]]
 #
 plt.clf()
+print "upper_left:\t" + str(upper_left)
+print "upper_left_25:\t" + str(upper_left_25)
+print "upper_left_50:\t" + str(upper_left_50)
+print "upper_left_75:\t" + str(upper_left_75)
+
+print "dist_upper_left:\t" + str(dist_upper_left)
+print "dist_upper_left_25:\t" + str(dist_upper_left_25)
+print "dist_upper_left_50:\t" + str(dist_upper_left_50)
+print "dist_upper_left_75:\t" + str(dist_upper_left_75)
+
+print "upper_right:\t" + str(upper_right)
+print "upper_right_25:\t" + str(upper_right_25)
+print "upper_right_50:\t" + str(upper_right_50)
+print "upper_right_75:\t" + str(upper_right_75)
+
+print "dist_upper_right:\t" + str(dist_upper_right)
+print "dist_upper_right_25:\t" + str(dist_upper_right_25)
+print "dist_upper_right_50:\t" + str(dist_upper_right_50)
+print "dist_upper_right_75:\t" + str(dist_upper_right_75)
+
+print "lower_left:\t" + str(lower_left)
+print "lower_left_25:\t" + str(lower_left_25)
+print "lower_left_50:\t" + str(lower_left_50)
+print "lower_left_75:\t" + str(lower_left_75)
+
+print "lower_right:\t" + str(lower_right)
+print "lower_right_25:\t" + str(lower_right_25)
+print "lower_right_50:\t" + str(lower_right_50)
+print "lower_right_75:\t" + str(lower_right_75)
 
 plt.imshow(heatmap, extent=extent)
 cb = plt.colorbar()
