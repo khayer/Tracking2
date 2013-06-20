@@ -54,8 +54,8 @@ perc_50_height = int((half_height-half_height*0.35)/2)
 perc_25_width = int((half_width-half_width*0.15)/2)
 perc_25_height = int((half_height-half_height*0.15)/2)
 
-bout_threshold = 5
-threshold = 3
+bout_threshold = 6
+dist_threshold = 3
 correction_width_inner = 20
 correction_width_outer = 40
 correction_height_inner = 15
@@ -136,7 +136,7 @@ mid_points = []
 print half_width
 print half_height
 frame_number = cap.get(CV_CAP_PROP_POS_FRAMES)
-while(frame_number < 500):
+while(frame_number < total_number_of_frames):
     frame_number = cap.get(CV_CAP_PROP_POS_FRAMES)
     # read the frames
     _,frame = cap.read()
@@ -227,7 +227,7 @@ while(frame_number < 500):
             left_upper_bool = 0
             last_upper_left = last_upper_left or mp
             distance = dist(last_upper_left,mp)
-            if distance > threshold:
+            if distance > dist_threshold:
                 upper_left_i = 0 or upper_left_i
                 upper_left_i = upper_left_i + 1
                 if upper_left_i == bout_threshold:
@@ -257,7 +257,7 @@ while(frame_number < 500):
             right_upper_bool = 0
             last_upper_right = last_upper_right or mp
             distance = dist(last_upper_right,mp)
-            if distance > threshold:
+            if distance > dist_threshold:
                 upper_right_i = 0 or upper_right_i
                 upper_right_i = upper_right_i + 1
                 if upper_right_i == bout_threshold:
@@ -286,7 +286,7 @@ while(frame_number < 500):
             left_lower_bool = 0
             last_lower_left = last_lower_left or mp
             distance = dist(last_lower_left,mp)
-            if distance > threshold:
+            if distance > dist_threshold:
                 lower_left_i = 0 or lower_left_i
                 lower_left_i = lower_left_i + 1
                 if lower_left_i == bout_threshold:
@@ -315,7 +315,7 @@ while(frame_number < 500):
             right_lower_bool = 0
             last_lower_right = last_lower_right or mp
             distance = dist(last_lower_right,mp)
-            if distance > threshold:
+            if distance > dist_threshold:
                 lower_right_i = 0 or lower_right_i
                 lower_right_i = lower_right_i + 1
                 if lower_right_i == bout_threshold:
