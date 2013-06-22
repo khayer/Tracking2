@@ -24,7 +24,9 @@ CV_CAP_PROP_MODE = 9
 #CV_CAP_PROP_RECTIFICATION
 
 # create video capture
-cap = cv2.VideoCapture("/Users/hayer/Desktop/Anand/openfields/100411_batch2-openfield.m4v")
+#cap = cv2.VideoCapture("/Users/hayer/Desktop/Anand/openfields/100411_batch2-openfield.m4v")
+cap = cv2.VideoCapture("/Users/kat/Desktop/071411_batch4-openfield.m4v")
+
 ##if (!cap.isOpened()):  // check if we succeeded
  ##   return -1;
 print cap.isOpened()
@@ -54,7 +56,7 @@ perc_50_height = int((half_height-half_height*0.35)/2)
 perc_25_width = int((half_width-half_width*0.15)/2)
 perc_25_height = int((half_height-half_height*0.15)/2)
 
-bout_threshold = 6
+bout_threshold = 11
 dist_threshold = 3
 correction_width_inner = 20
 correction_width_outer = 40
@@ -111,6 +113,8 @@ last_lower_right = None
 lower_right_i = None
 lower_right_num_bout = 0
 lower_right_frame_bout = 0
+lower_right_distance_bout = 0
+lower_right_lap_bout = []
 lower_right = lower_right_75 = lower_right_50 = lower_right_25 = 0
 dist_lower_right = dist_lower_right_75 = dist_lower_right_50 = dist_lower_right_25 = 0
 lower_right_point1 = tuple([half_width,half_height])
@@ -136,7 +140,8 @@ mid_points = []
 print half_width
 print half_height
 frame_number = cap.get(CV_CAP_PROP_POS_FRAMES)
-while(frame_number < total_number_of_frames):
+#while(frame_number < total_number_of_frames):
+while(frame_number < 500):
     frame_number = cap.get(CV_CAP_PROP_POS_FRAMES)
     # read the frames
     _,frame = cap.read()
@@ -320,9 +325,12 @@ while(frame_number < total_number_of_frames):
                 lower_right_i = lower_right_i + 1
                 if lower_right_i == bout_threshold:
                     lower_right_num_bout = lower_right_num_bout + 1
+                    lower_right_lap_bout.append(0)
                 if lower_right_i >= bout_threshold:
                     cv2.circle(frame,mp, 5, cv.CV_RGB(255,255,0))
                     lower_right_frame_bout = lower_right_frame_bout + 1
+                    lower_right_distance_bout = lower_right_distance_bout + distance
+                    lower_right_lap_bout[-1] = lower_right_lap_bout[-1] +1
             else:
                 distance = 0
                 lower_right_i = 0
@@ -487,6 +495,10 @@ print "speed_lower_right_75:\t" + str(speed_lower_right_75)
 
 print "lower_right_num_bout:\t" + str(lower_right_num_bout)
 print "seconds in bout:\t" + str(lower_right_frame_bout / frame_per_sec)
+
+print "lower_right_distance_bout:\t" + str(lower_right_distance_bout) 
+print "lower_right_lap_bout:"
+print lower_right_lap_bout 
 
 plt.imshow(heatmap, extent=extent)
 cb = plt.colorbar()
