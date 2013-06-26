@@ -2,6 +2,7 @@ import cv2,cv
 import numpy as np
 import matplotlib.pyplot as plt
 import math
+import sys
 
 CV_CAP_PROP_POS_MSEC = 0
 CV_CAP_PROP_POS_FRAMES = 1
@@ -54,7 +55,7 @@ perc_50_height = int((half_height-half_height*0.35)/2)
 perc_25_width = int((half_width-half_width*0.15)/2)
 perc_25_height = int((half_height-half_height*0.15)/2)
 
-bout_threshold = 6
+bout_threshold = 12
 dist_threshold = 3
 correction_width_inner = 20
 correction_width_outer = 40
@@ -140,6 +141,11 @@ while(frame_number < total_number_of_frames):
     frame_number = cap.get(CV_CAP_PROP_POS_FRAMES)
     # read the frames
     _,frame = cap.read()
+    percent = frame_number/total_number_of_frames * 100
+    l = int(percent/2)
+    if l%2==0:
+      sys.stdout.write("\r[%-50s] %d%%" % ('='*int(l), percent))
+      sys.stdout.flush()
     #capture = cv.CaptureFromFile("/Users/hayer/Desktop/Anand/openfields/071211_Batch1-openfield.m4v")
 
     # smooth it
