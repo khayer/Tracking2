@@ -468,7 +468,8 @@ print "seconds in bout:\t" + str(upper_right_frame_bout / frame_per_sec)
 
 print "upper_right_distance_bout:\t" + str(upper_right_distance_bout/conversion_pixel_to_cm)
 print "upper_right_lap_bout:"
-print upper_right_lap_bout
+print "\t".join(map(str,upper_right_lap_bout))
+
 
 print "----------------------------"
 print "upper_left:\t" + str(upper_left/ frame_per_sec)
@@ -500,7 +501,8 @@ print "seconds in bout:\t" + str(upper_left_frame_bout / frame_per_sec)
 
 print "upper_left_distance_bout:\t" + str(upper_left_distance_bout/conversion_pixel_to_cm)
 print "upper_left_lap_bout:"
-print upper_left_lap_bout
+print "\t".join(map(str,upper_left_lap_bout))
+
 
 print "----------------------------"
 print "lower_left:\t" + str(lower_left/ frame_per_sec)
@@ -532,7 +534,8 @@ print "seconds in bout:\t" + str(lower_left_frame_bout / frame_per_sec)
 
 print "lower_left_distance_bout:\t" + str(lower_left_distance_bout/conversion_pixel_to_cm)
 print "lower_left_lap_bout:"
-print lower_left_lap_bout
+print "\t".join(map(str,lower_left_lap_bout))
+
 
 print "----------------------------"
 print "lower_right:\t" + str(lower_right/ frame_per_sec)
@@ -564,7 +567,8 @@ print "seconds in bout:\t" + str(lower_right_frame_bout / frame_per_sec)
 
 print "lower_right_distance_bout:\t" + str(lower_right_distance_bout/conversion_pixel_to_cm)
 print "lower_right_lap_bout:"
-print lower_right_lap_bout
+print "\t".join(map(str,lower_right_lap_bout))
+
 
 plt.imshow(heatmap, extent=extent)
 cb = plt.colorbar()
