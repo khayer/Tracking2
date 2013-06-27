@@ -56,7 +56,7 @@ perc_50_height = int((half_height-half_height*0.35)/2)
 perc_25_width = int((half_width-half_width*0.15)/2)
 perc_25_height = int((half_height-half_height*0.15)/2)
 
-bout_threshold = 11
+bout_threshold = 5
 dist_threshold = 3
 conversion_pixel_to_cm = 10
 correction_width_inner = 20
