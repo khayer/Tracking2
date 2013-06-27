@@ -25,7 +25,7 @@ CV_CAP_PROP_MODE = 9
 #CV_CAP_PROP_RECTIFICATION
 
 # create video capture
-cap = cv2.VideoCapture("/Users/hayer/Desktop/Anand/openfields/100411_batch2-openfield.m4v")
+cap = cv2.VideoCapture("/Users/hayer/Desktop/Anand/openfields/100611_openfield.m4v")
 #cap = cv2.VideoCapture("/Users/kat/Desktop/071411_batch4-openfield.m4v")
 
 ##if (!cap.isOpened()):  // check if we succeeded
@@ -57,11 +57,7 @@ perc_50_height = int((half_height-half_height*0.35)/2)
 perc_25_width = int((half_width-half_width*0.15)/2)
 perc_25_height = int((half_height-half_height*0.15)/2)
 
-<<<<<<< HEAD
-bout_threshold = 12
-=======
 bout_threshold = 11
->>>>>>> feature/lap_time
 dist_threshold = 3
 conversion_pixel_to_cm = 10
 correction_width_inner = 20

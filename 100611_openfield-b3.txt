@@ -1,0 +1,6 @@
+WARNING: Couldn't read movie file /Users/hayer/Desktop/Anand/openfields/100611_openfield.m4v
+False
+0.0
+0.0
+0
+0
