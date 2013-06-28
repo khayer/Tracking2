@@ -25,7 +25,7 @@ CV_CAP_PROP_MODE = 9
 #CV_CAP_PROP_RECTIFICATION
 
 # create video capture
-cap = cv2.VideoCapture("/Users/hayer/Desktop/Anand/openfields/100611_openfield.m4v")
+cap = cv2.VideoCapture("/Users/hayer/Desktop/Anand/openfields/100611_openfield-b5.m4v")
 #cap = cv2.VideoCapture("/Users/kat/Desktop/071411_batch4-openfield.m4v")
 
 ##if (!cap.isOpened()):  // check if we succeeded
