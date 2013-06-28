@@ -141,6 +141,7 @@ lower_right_25_point2 = tuple([width-perc_25_width-correction_width_outer,height
 
 _,frame2 = cap.read()
 
+## Points for heatmap
 x = []
 y = []
 mid_points = []
@@ -153,7 +154,7 @@ print half_width
 print half_height
 frame_number = cap.get(CV_CAP_PROP_POS_FRAMES)
 while(frame_number < total_number_of_frames):
-#while(frame_number < 500):
+#while(frame_number < 250):
     frame_number = cap.get(CV_CAP_PROP_POS_FRAMES)
     # read the frames
     _,frame = cap.read()
@@ -234,6 +235,7 @@ while(frame_number < total_number_of_frames):
             number_of_points = number_of_points + 1
             summe = [summe[0]+point[0][0],summe[1]+point[0][1]]
         mid_point = [summe[0]/number_of_points,summe[1]/number_of_points]
+        ## Points for Histogramm
         x.append(mid_point[0])
         y.append(mid_point[1])
         mid_point = tuple([int(mid_point[0]),int(mid_point[1])])
@@ -429,20 +431,12 @@ while(frame_number < total_number_of_frames):
     cv2.imshow('frame',frame)
     if cv2.waitKey(33)== 27:
         break
+
 cv2.imwrite("tra.png",frame2)
 # Clean up everything before leaving
 cv2.destroyAllWindows()
 cap.release()
 
-
-#
-## Generate some test data
-#
-#
-heatmap, xedges, yedges = np.histogram2d(x, y, bins=50)
-extent = [xedges[0], xedges[-1], yedges[0], yedges[-1]]
-#
-plt.clf()
 print "Results: ----------------------------"
 
 print "upper_right:\t" + str(upper_right/ frame_per_sec)
@@ -575,7 +569,10 @@ print "lower_right_distance_bout:\t" + str(lower_right_distance_bout/conversion_
 print "lower_right_lap_bout:"
 print "\t".join(map(str,lower_right_lap_bout))
 
-
+## Draw heatmap
+heatmap, xedges, yedges = np.histogram2d(y, x, bins=50)
+extent = [ yedges[0], yedges[-1], xedges[0], xedges[-1]]
+plt.clf()
 plt.imshow(heatmap, extent=extent)
 cb = plt.colorbar()
 cb.set_label('mean value')
