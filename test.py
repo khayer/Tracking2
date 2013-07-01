@@ -24,9 +24,15 @@ CV_CAP_PROP_MODE = 9
 #CV_CAP_PROP_WHITE_BALANCE Currently not supported
 #CV_CAP_PROP_RECTIFICATION
 
+if len(sys.argv) != 2:
+    sys.stderr.write("usage: python test.py video_file\n")
+    sys.exit()
 # create video capture
-cap = cv2.VideoCapture("/Users/hayer/Desktop/Anand/openfields/100611_openfield-b5.m4v")
+#cap = cv2.VideoCapture("/Users/hayer/Desktop/Anand/openfields/100611_openfield-b5.m4v")
 #cap = cv2.VideoCapture("/Users/kat/Desktop/071411_batch4-openfield.m4v")
+cap = cv2.VideoCapture(sys.argv[1])
+sample_name = sys.argv[1].split("/")[-1].split(".")[0]
+print sample_name
 
 ##if (!cap.isOpened()):  // check if we succeeded
  ##   return -1;
