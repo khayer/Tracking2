@@ -35,20 +35,8 @@ if len(sys.argv) != 3:
 #cap = cv2.VideoCapture("/Users/kat/Desktop/071411_batch4-openfield.m4v")
 cap = cv2.VideoCapture(sys.argv[1])
 sample_name = sys.argv[1].split("/")[-1].split(".")[0]
-results_excel = sys.argv[2]
-rb = open_workbook(results_excel,formatting_info=True)
-r_sheet = rb.sheet_by_index(0)
-wb = copy(rb) # a writable copy (I can't read values out of this, only write to it)
-print "nina"
-w_sheet = wb.get_sheet(0)
-START_ROW = 0
-for row_index in range(r_sheet.nrows,r_sheet.nrows+3):
-    #age_nov = r_sheet.cell(row_index, col_age_november).value
-    #If 3, then Combo I 3-4 year old  for both summer1 and fall1
-    w_sheet.write(row_index, 0, 'nina')
-    w_sheet.write(row_index, 1, 'k')
-wb.save(results_excel)
-sys.exit()
+
+
 print sample_name
 
 
@@ -60,8 +48,31 @@ total_number_of_frames = cap.get(CV_CAP_PROP_FRAME_COUNT)
 print total_number_of_frames
 frame_per_sec = cap.get(CV_CAP_PROP_FPS)
 print frame_per_sec
-width = int(cap.get(3))
-height = int(cap.get(4))
+
+_,frame2 = cap.read()
+
+imgray = cv2.cvtColor(frame2,cv2.COLOR_BGR2GRAY)
+ret,thresh = cv2.threshold(imgray,210,255,0)
+cv2.imwrite("gray_tra.png",thresh)
+contours,hierarchy = cv2.findContours(thresh,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
+num_p = 0
+sum_x = []
+sum_y = []
+for cnt in contours:
+    for point in cnt:
+        num_p = num_p + 1
+        sum_x.append(point[0][0])
+        sum_y.append(point[0][1])
+print np.median(sum_x)
+print np.median(sum_y)
+
+
+#width = int(cap.get(3))
+#height = int(cap.get(4))
+
+width = 2*int(np.median(sum_x))
+height = 2*int(np.median(sum_y))
+
 
 def comp_tuple(mp,pt1,pt2):
     return mp[0] >= pt1[0] and mp[0] <= pt2[0] and mp[1] >= pt1[1] and mp[1] <= pt2[1]
@@ -86,8 +97,8 @@ dist_threshold = 3
 conversion_pixel_to_cm = 10
 correction_width_inner = 20
 correction_width_outer = 40
-correction_height_inner = 15
-correction_height_outer = 25
+correction_height_inner = 5
+correction_height_outer = 5
 
 last_upper_left = None
 upper_left_i = None
@@ -136,12 +147,12 @@ dist_lower_left = dist_lower_left_75 = dist_lower_left_50 = dist_lower_left_25 =
 lower_left_point1 = tuple([0,half_height])
 lower_left_point2 = tuple([half_width,height])
 lower_left_last_known_point = lower_left_point1
-lower_left_75_point1 = tuple([perc_75_width+ correction_width_outer,half_height+perc_75_height-correction_height_inner])
-lower_left_75_point2 = tuple([half_width-perc_75_width+ correction_width_inner,height-perc_75_height-correction_height_outer])
-lower_left_50_point1 = tuple([perc_50_width+ correction_width_outer,half_height+perc_50_height-correction_height_inner])
-lower_left_50_point2 = tuple([half_width-perc_50_width+ correction_width_inner,height-perc_50_height-correction_height_outer])
-lower_left_25_point1 = tuple([perc_25_width+ correction_width_outer,half_height+perc_25_height-correction_height_inner])
-lower_left_25_point2 = tuple([half_width-perc_25_width+ correction_width_inner,height-perc_25_height-correction_height_outer])
+lower_left_75_point1 = tuple([perc_75_width+ correction_width_outer,half_height+perc_75_height+correction_height_inner])
+lower_left_75_point2 = tuple([half_width-perc_75_width+ correction_width_inner,height-perc_75_height+correction_height_outer])
+lower_left_50_point1 = tuple([perc_50_width+ correction_width_outer,half_height+perc_50_height+correction_height_inner])
+lower_left_50_point2 = tuple([half_width-perc_50_width+ correction_width_inner,height-perc_50_height+correction_height_outer])
+lower_left_25_point1 = tuple([perc_25_width+ correction_width_outer,half_height+perc_25_height+correction_height_inner])
+lower_left_25_point2 = tuple([half_width-perc_25_width+ correction_width_inner,height-perc_25_height+correction_height_outer])
 
 
 last_lower_right = None
@@ -155,15 +166,15 @@ dist_lower_right = dist_lower_right_75 = dist_lower_right_50 = dist_lower_right_
 lower_right_point1 = tuple([half_width,half_height])
 lower_right_point2 = tuple([width,height])
 lower_right_last_known_point = lower_right_point1
-lower_right_75_point1 = tuple([half_width+perc_75_width- correction_width_inner,half_height+perc_75_height-correction_height_inner])
-lower_right_75_point2 = tuple([width-perc_75_width- correction_width_outer ,height-perc_75_height-correction_height_outer])
-lower_right_50_point1 = tuple([half_width+perc_50_width-correction_width_inner,half_height+perc_50_height-correction_height_inner])
-lower_right_50_point2 = tuple([width-perc_50_width-correction_width_outer,height-perc_50_height-correction_height_outer])
-lower_right_25_point1 = tuple([half_width+perc_25_width-correction_width_inner,half_height+perc_25_height-correction_height_inner])
-lower_right_25_point2 = tuple([width-perc_25_width-correction_width_outer,height-perc_25_height-correction_height_outer])
+lower_right_75_point1 = tuple([half_width+perc_75_width- correction_width_inner,half_height+perc_75_height+correction_height_inner])
+lower_right_75_point2 = tuple([width-perc_75_width- correction_width_outer ,height-perc_75_height+correction_height_outer])
+lower_right_50_point1 = tuple([half_width+perc_50_width-correction_width_inner,half_height+perc_50_height+correction_height_inner])
+lower_right_50_point2 = tuple([width-perc_50_width-correction_width_outer,height-perc_50_height+correction_height_outer])
+lower_right_25_point1 = tuple([half_width+perc_25_width-correction_width_inner,half_height+perc_25_height+correction_height_inner])
+lower_right_25_point2 = tuple([width-perc_25_width-correction_width_outer,height-perc_25_height+correction_height_outer])
 
 
-_,frame2 = cap.read()
+
 
 ## Points for heatmap
 x = []
@@ -462,29 +473,65 @@ cv2.destroyAllWindows()
 cap.release()
 
 
-wb = xlrd.open_workbook(results_excel,formatting_info=True)
+results_excel = sys.argv[2]
+rb = open_workbook(results_excel,formatting_info=True)
+r_sheet = rb.sheet_by_index(0)
+wb = copy(rb) # a writable copy (I can't read values out of this, only write to it)
 w_sheet = wb.get_sheet(0)
+#for row_index in range(r_sheet.nrows,r_sheet.nrows+3):
+#    #age_nov = r_sheet.cell(row_index, col_age_november).value
+#    #If 3, then Combo I 3-4 year old  for both summer1 and fall1
+#    w_sheet.write(row_index, 0, 'nina')
+#    w_sheet.write(row_index, 1, 'k')
 
-for row_index in range(START_ROW, r_sheet.nrows):
-    #age_nov = r_sheet.cell(row_index, col_age_november).value
-    k = r_sheet.cell(row_index,0).value
-    if age_nov == nil:
-        #If 3, then Combo I 3-4 year old  for both summer1 and fall1
-        w_sheet.write(row_index, 0, 'nina')
-        w_sheet.write(row_index, 1, 'k')
 
-print "Results: ----------------------------"
+w_sheet.write(r_sheet.nrows+1,0,"Results for " + sample_name)
+### UPPER LEFT
+w_sheet.write(r_sheet.nrows+2,0,"upper_left")
+# TIME
+w_sheet.write(r_sheet.nrows+2,1,(upper_left    / frame_per_sec))
+w_sheet.write(r_sheet.nrows+2,2,(upper_left_75 / frame_per_sec))
+w_sheet.write(r_sheet.nrows+2,3,(upper_left_50 / frame_per_sec))
+w_sheet.write(r_sheet.nrows+2,4,(upper_left_25 / frame_per_sec))
+# DISTANCE
+w_sheet.write(r_sheet.nrows+2,5,(dist_upper_left /conversion_pixel_to_cm))
+w_sheet.write(r_sheet.nrows+2,6,(dist_upper_left_75 / conversion_pixel_to_cm))
+w_sheet.write(r_sheet.nrows+2,7,(dist_upper_left_50 / conversion_pixel_to_cm))
+w_sheet.write(r_sheet.nrows+2,8,(dist_upper_left_25 / conversion_pixel_to_cm))
+# SPEED
+speed_upper_left = speed_upper_left_25 = speed_upper_left_50 = speed_upper_left_75 = 0
+if upper_left / frame_per_sec > 0:
+    speed_upper_left = dist_upper_left/conversion_pixel_to_cm / ( upper_left /frame_per_sec)
+if upper_left_25 / frame_per_sec > 0:
+    speed_upper_left_25 = dist_upper_left_25/conversion_pixel_to_cm/ (upper_left_25/frame_per_sec)
+if upper_left_50 / frame_per_sec > 0:
+    speed_upper_left_50 = dist_upper_left_50/conversion_pixel_to_cm/ (upper_left_50/frame_per_sec )
+if upper_left_75 / frame_per_sec > 0:
+    speed_upper_left_75 = dist_upper_left_75/conversion_pixel_to_cm/ (upper_left_75/ frame_per_sec )
+w_sheet.write(r_sheet.nrows+2,9,(speed_upper_left))
+w_sheet.write(r_sheet.nrows+2,10,(speed_upper_left_75))
+w_sheet.write(r_sheet.nrows+2,11,(speed_upper_left_50))
+w_sheet.write(r_sheet.nrows+2,12,(speed_upper_left_25))
+# BOUTS
+w_sheet.write(r_sheet.nrows+2,13,(upper_left_num_bout))
+w_sheet.write(r_sheet.nrows+2,14,(upper_left_frame_bout / frame_per_sec))
+w_sheet.write(r_sheet.nrows+2,15,(upper_left_distance_bout/conversion_pixel_to_cm))
+for i,f in enumerate(upper_left_lap_bout):
+    w_sheet.write(r_sheet.nrows+2,i+16,f)
 
-print "time_s_upper_right:\t" + str(upper_right/ frame_per_sec)
-print "time_s_upper_right_25:\t" + str(upper_right_25 / frame_per_sec)
-print "time_s_upper_right_50:\t" + str(upper_right_50/ frame_per_sec)
-print "time_s_upper_right_75:\t" + str(upper_right_75/ frame_per_sec)
-
-print "dist_upper_right:\t" + str(dist_upper_right/conversion_pixel_to_cm)
-print "dist_upper_right_25:\t" + str(dist_upper_right_25/conversion_pixel_to_cm)
-print "dist_upper_right_50:\t" + str(dist_upper_right_50/conversion_pixel_to_cm)
-print "dist_upper_right_75:\t" + str(dist_upper_right_75/conversion_pixel_to_cm)
-
+### UPPER RIGHT
+w_sheet.write(r_sheet.nrows+3,0,"upper_right")
+# TIME
+w_sheet.write(r_sheet.nrows+3,1,(upper_right    / frame_per_sec))
+w_sheet.write(r_sheet.nrows+3,2,(upper_right_75 / frame_per_sec))
+w_sheet.write(r_sheet.nrows+3,3,(upper_right_50 / frame_per_sec))
+w_sheet.write(r_sheet.nrows+3,4,(upper_right_25 / frame_per_sec))
+# DISTANCE
+w_sheet.write(r_sheet.nrows+3,5,(dist_upper_right /conversion_pixel_to_cm))
+w_sheet.write(r_sheet.nrows+3,6,(dist_upper_right_75 / conversion_pixel_to_cm))
+w_sheet.write(r_sheet.nrows+3,7,(dist_upper_right_50 / conversion_pixel_to_cm))
+w_sheet.write(r_sheet.nrows+3,8,(dist_upper_right_25 / conversion_pixel_to_cm))
+# SPEED
 speed_upper_right = speed_upper_right_25 = speed_upper_right_50 = speed_upper_right_75 = 0
 if upper_right / frame_per_sec > 0:
     speed_upper_right = dist_upper_right/conversion_pixel_to_cm / ( upper_right /frame_per_sec)
@@ -494,17 +541,105 @@ if upper_right_50 / frame_per_sec > 0:
     speed_upper_right_50 = dist_upper_right_50/conversion_pixel_to_cm/ (upper_right_50/frame_per_sec )
 if upper_right_75 / frame_per_sec > 0:
     speed_upper_right_75 = dist_upper_right_75/conversion_pixel_to_cm/ (upper_right_75/ frame_per_sec )
-print "speed_upper_right:\t" + str(speed_upper_right)
-print "speed_upper_right_25:\t" + str(speed_upper_right_25)
-print "speed_upper_right_50:\t" + str(speed_upper_right_50)
-print "speed_upper_right_75:\t" + str(speed_upper_right_75)
+w_sheet.write(r_sheet.nrows+3,9,(speed_upper_right))
+w_sheet.write(r_sheet.nrows+3,10,(speed_upper_right_75))
+w_sheet.write(r_sheet.nrows+3,11,(speed_upper_right_50))
+w_sheet.write(r_sheet.nrows+3,12,(speed_upper_right_25))
+# BOUTS
+w_sheet.write(r_sheet.nrows+3,13,(upper_right_num_bout))
+w_sheet.write(r_sheet.nrows+3,14,(upper_right_frame_bout / frame_per_sec))
+w_sheet.write(r_sheet.nrows+3,15,(upper_right_distance_bout/conversion_pixel_to_cm))
+for i,f in enumerate(upper_right_lap_bout):
+    w_sheet.write(r_sheet.nrows+3,i+16,f)
 
-print "upper_right_num_bout:\t" + str(upper_right_num_bout)
-print "seconds in bout:\t" + str(upper_right_frame_bout / frame_per_sec)
+### LOWER LEFT
+w_sheet.write(r_sheet.nrows+4,0,"lower_left")
+# TIME
+w_sheet.write(r_sheet.nrows+4,1,(lower_left    / frame_per_sec))
+w_sheet.write(r_sheet.nrows+4,2,(lower_left_75 / frame_per_sec))
+w_sheet.write(r_sheet.nrows+4,3,(lower_left_50 / frame_per_sec))
+w_sheet.write(r_sheet.nrows+4,4,(lower_left_25 / frame_per_sec))
+# DISTANCE
+w_sheet.write(r_sheet.nrows+4,5,(dist_lower_left /conversion_pixel_to_cm))
+w_sheet.write(r_sheet.nrows+4,6,(dist_lower_left_75 / conversion_pixel_to_cm))
+w_sheet.write(r_sheet.nrows+4,7,(dist_lower_left_50 / conversion_pixel_to_cm))
+w_sheet.write(r_sheet.nrows+4,8,(dist_lower_left_25 / conversion_pixel_to_cm))
+# SPEED
+speed_lower_left = speed_lower_left_25 = speed_lower_left_50 = speed_lower_left_75 = 0
+if lower_left / frame_per_sec > 0:
+    speed_lower_left = dist_lower_left/conversion_pixel_to_cm / ( lower_left /frame_per_sec)
+if lower_left_25 / frame_per_sec > 0:
+    speed_lower_left_25 = dist_lower_left_25/conversion_pixel_to_cm/ (lower_left_25/frame_per_sec)
+if lower_left_50 / frame_per_sec > 0:
+    speed_lower_left_50 = dist_lower_left_50/conversion_pixel_to_cm/ (lower_left_50/frame_per_sec )
+if lower_left_75 / frame_per_sec > 0:
+    speed_lower_left_75 = dist_lower_left_75/conversion_pixel_to_cm/ (lower_left_75/ frame_per_sec )
+w_sheet.write(r_sheet.nrows+4,9,(speed_lower_left))
+w_sheet.write(r_sheet.nrows+4,10,(speed_lower_left_75))
+w_sheet.write(r_sheet.nrows+4,11,(speed_lower_left_50))
+w_sheet.write(r_sheet.nrows+4,12,(speed_lower_left_25))
+# BOUTS
+w_sheet.write(r_sheet.nrows+4,13,(lower_left_num_bout))
+w_sheet.write(r_sheet.nrows+4,14,(lower_left_frame_bout / frame_per_sec))
+w_sheet.write(r_sheet.nrows+4,15,(lower_left_distance_bout/conversion_pixel_to_cm))
+for i,f in enumerate(lower_left_lap_bout):
+    w_sheet.write(r_sheet.nrows+4,i+16,f)
 
-print "upper_right_distance_bout:\t" + str(upper_right_distance_bout/conversion_pixel_to_cm)
-print "upper_right_lap_bout:"
-print "\t".join(map(str,upper_right_lap_bout))
+### UPPER LEFT
+w_sheet.write(r_sheet.nrows+5,0,"lower_right")
+# TIME
+w_sheet.write(r_sheet.nrows+5,1,(lower_right    / frame_per_sec))
+w_sheet.write(r_sheet.nrows+5,2,(lower_right_75 / frame_per_sec))
+w_sheet.write(r_sheet.nrows+5,3,(lower_right_50 / frame_per_sec))
+w_sheet.write(r_sheet.nrows+5,4,(lower_right_25 / frame_per_sec))
+# DISTANCE
+w_sheet.write(r_sheet.nrows+5,5,(dist_lower_right /conversion_pixel_to_cm))
+w_sheet.write(r_sheet.nrows+5,6,(dist_lower_right_75 / conversion_pixel_to_cm))
+w_sheet.write(r_sheet.nrows+5,7,(dist_lower_right_50 / conversion_pixel_to_cm))
+w_sheet.write(r_sheet.nrows+5,8,(dist_lower_right_25 / conversion_pixel_to_cm))
+# SPEED
+speed_lower_right = speed_lower_right_25 = speed_lower_right_50 = speed_lower_right_75 = 0
+if lower_right / frame_per_sec > 0:
+    speed_lower_right = dist_lower_right/conversion_pixel_to_cm / ( lower_right /frame_per_sec)
+if lower_right_25 / frame_per_sec > 0:
+    speed_lower_right_25 = dist_lower_right_25/conversion_pixel_to_cm/ (lower_right_25/frame_per_sec)
+if lower_right_50 / frame_per_sec > 0:
+    speed_lower_right_50 = dist_lower_right_50/conversion_pixel_to_cm/ (lower_right_50/frame_per_sec )
+if lower_right_75 / frame_per_sec > 0:
+    speed_lower_right_75 = dist_lower_right_75/conversion_pixel_to_cm/ (lower_right_75/ frame_per_sec )
+w_sheet.write(r_sheet.nrows+5,9,(speed_lower_right))
+w_sheet.write(r_sheet.nrows+5,10,(speed_lower_right_75))
+w_sheet.write(r_sheet.nrows+5,11,(speed_lower_right_50))
+w_sheet.write(r_sheet.nrows+5,12,(speed_lower_right_25))
+# BOUTS
+w_sheet.write(r_sheet.nrows+5,13,(lower_right_num_bout))
+w_sheet.write(r_sheet.nrows+5,14,(lower_right_frame_bout / frame_per_sec))
+w_sheet.write(r_sheet.nrows+5,15,(lower_right_distance_bout/conversion_pixel_to_cm))
+for i,f in enumerate(lower_right_lap_bout):
+    w_sheet.write(r_sheet.nrows+5,i+16,f)
+
+#print "time_s_upper_right:\t" + str(upper_right/ frame_per_sec)
+#print "time_s_upper_right_25:\t" + str(upper_right_25 / frame_per_sec)
+#print "time_s_upper_right_50:\t" + str(upper_right_50/ frame_per_sec)
+#print "time_s_upper_right_75:\t" + str(upper_right_75/ frame_per_sec)
+#
+#print "dist_upper_right:\t" + str(dist_upper_right/conversion_pixel_to_cm)
+#print "dist_upper_right_25:\t" + str(dist_upper_right_25/conversion_pixel_to_cm)
+#print "dist_upper_right_50:\t" + str(dist_upper_right_50/conversion_pixel_to_cm)
+#print "dist_upper_right_75:\t" + str(dist_upper_right_75/conversion_pixel_to_cm)
+#
+
+#print "speed_upper_right:\t" + str(speed_upper_right)
+#print "speed_upper_right_25:\t" + str(speed_upper_right_25)
+#print "speed_upper_right_50:\t" + str(speed_upper_right_50)
+#print "speed_upper_right_75:\t" + str(speed_upper_right_75)
+#
+#print "upper_right_num_bout:\t" + str(upper_right_num_bout)
+#print "seconds in bout:\t" + str(upper_right_frame_bout / frame_per_sec)
+#
+#print "upper_right_distance_bout:\t" + str(upper_right_distance_bout/conversion_pixel_to_cm)
+#print "upper_right_lap_bout:"
+#print "\t".join(map(str,upper_right_lap_bout))
 
 
 print "----------------------------"
@@ -604,6 +739,8 @@ print "seconds in bout:\t" + str(lower_right_frame_bout / frame_per_sec)
 print "lower_right_distance_bout:\t" + str(lower_right_distance_bout/conversion_pixel_to_cm)
 print "lower_right_lap_bout:"
 print "\t".join(map(str,lower_right_lap_bout))
+
+wb.save(results_excel)
 
 ## Draw heatmap
 heatmap, xedges, yedges = np.histogram2d(y, x, bins=50)
