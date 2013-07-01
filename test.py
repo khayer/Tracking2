@@ -159,8 +159,8 @@ mid_points = []
 print half_width
 print half_height
 frame_number = cap.get(CV_CAP_PROP_POS_FRAMES)
-while(frame_number < total_number_of_frames):
-#while(frame_number < 250):
+#while(frame_number < total_number_of_frames):
+while(frame_number < 250):
     frame_number = cap.get(CV_CAP_PROP_POS_FRAMES)
     # read the frames
     _,frame = cap.read()
@@ -438,7 +438,7 @@ while(frame_number < total_number_of_frames):
     if cv2.waitKey(33)== 27:
         break
 
-cv2.imwrite("tra.png",frame2)
+cv2.imwrite(sample_name + "_tra.png",frame2)
 # Clean up everything before leaving
 cv2.destroyAllWindows()
 cap.release()
@@ -582,6 +582,6 @@ plt.clf()
 plt.imshow(heatmap, extent=extent)
 cb = plt.colorbar()
 cb.set_label('mean value')
-plt.savefig("heatmap.png")
+plt.savefig(sample_name + "_heatmap.png")
 
 
