@@ -3,7 +3,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 import sys
-import xlutils
+from xlutils.copy import copy
+from xlrd import open_workbook
+from xlwt import easyxf
 
 CV_CAP_PROP_POS_MSEC = 0
 CV_CAP_PROP_POS_FRAMES = 1
@@ -25,15 +27,30 @@ CV_CAP_PROP_MODE = 9
 #CV_CAP_PROP_WHITE_BALANCE Currently not supported
 #CV_CAP_PROP_RECTIFICATION
 
-if len(sys.argv) != 2:
-    sys.stderr.write("usage: python test.py video_file\n")
+if len(sys.argv) != 3:
+    sys.stderr.write("usage: python test.py video_file results.xls\n")
     sys.exit()
 # create video capture
 #cap = cv2.VideoCapture("/Users/hayer/Desktop/Anand/openfields/100611_openfield-b5.m4v")
 #cap = cv2.VideoCapture("/Users/kat/Desktop/071411_batch4-openfield.m4v")
 cap = cv2.VideoCapture(sys.argv[1])
 sample_name = sys.argv[1].split("/")[-1].split(".")[0]
+results_excel = sys.argv[2]
+rb = open_workbook(results_excel,formatting_info=True)
+r_sheet = rb.sheet_by_index(0)
+wb = copy(rb) # a writable copy (I can't read values out of this, only write to it)
+print "nina"
+w_sheet = wb.get_sheet(0)
+START_ROW = 0
+for row_index in range(r_sheet.nrows,r_sheet.nrows+3):
+    #age_nov = r_sheet.cell(row_index, col_age_november).value
+    #If 3, then Combo I 3-4 year old  for both summer1 and fall1
+    w_sheet.write(row_index, 0, 'nina')
+    w_sheet.write(row_index, 1, 'k')
+wb.save(results_excel)
+sys.exit()
 print sample_name
+
 
 ##if (!cap.isOpened()):  // check if we succeeded
  ##   return -1;
@@ -443,6 +460,18 @@ cv2.imwrite(sample_name + "_tra.png",frame2)
 # Clean up everything before leaving
 cv2.destroyAllWindows()
 cap.release()
+
+
+wb = xlrd.open_workbook(results_excel,formatting_info=True)
+w_sheet = wb.get_sheet(0)
+
+for row_index in range(START_ROW, r_sheet.nrows):
+    #age_nov = r_sheet.cell(row_index, col_age_november).value
+    k = r_sheet.cell(row_index,0).value
+    if age_nov == nil:
+        #If 3, then Combo I 3-4 year old  for both summer1 and fall1
+        w_sheet.write(row_index, 0, 'nina')
+        w_sheet.write(row_index, 1, 'k')
 
 print "Results: ----------------------------"
 
