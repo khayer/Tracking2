@@ -161,8 +161,8 @@ while(frame_number < total_number_of_frames):
     percent = frame_number/total_number_of_frames * 100
     l = int(percent/2)
     if l%2==0:
-      sys.stdout.write("\r[%-50s] %d%%" % ('='*int(l), percent))
-      sys.stdout.flush()
+      sys.stderr.write("\r[%-50s] %d%%" % ('='*int(l), percent))
+      sys.stderr.flush()
     #capture = cv.CaptureFromFile("/Users/hayer/Desktop/Anand/openfields/071211_Batch1-openfield.m4v")
 
     # smooth it
@@ -439,10 +439,10 @@ cap.release()
 
 print "Results: ----------------------------"
 
-print "upper_right:\t" + str(upper_right/ frame_per_sec)
-print "upper_right_25:\t" + str(upper_right_25 / frame_per_sec)
-print "upper_right_50:\t" + str(upper_right_50/ frame_per_sec)
-print "upper_right_75:\t" + str(upper_right_75/ frame_per_sec)
+print "time_s_upper_right:\t" + str(upper_right/ frame_per_sec)
+print "time_s_upper_right_25:\t" + str(upper_right_25 / frame_per_sec)
+print "time_s_upper_right_50:\t" + str(upper_right_50/ frame_per_sec)
+print "time_s_upper_right_75:\t" + str(upper_right_75/ frame_per_sec)
 
 print "dist_upper_right:\t" + str(dist_upper_right/conversion_pixel_to_cm)
 print "dist_upper_right_25:\t" + str(dist_upper_right_25/conversion_pixel_to_cm)
@@ -472,10 +472,10 @@ print "\t".join(map(str,upper_right_lap_bout))
 
 
 print "----------------------------"
-print "upper_left:\t" + str(upper_left/ frame_per_sec)
-print "upper_left_25:\t" + str(upper_left_25 / frame_per_sec)
-print "upper_left_50:\t" + str(upper_left_50/ frame_per_sec)
-print "upper_left_75:\t" + str(upper_left_75/ frame_per_sec)
+print "time_s_upper_left:\t" + str(upper_left/ frame_per_sec)
+print "time_s_upper_left_25:\t" + str(upper_left_25 / frame_per_sec)
+print "time_s_upper_left_50:\t" + str(upper_left_50/ frame_per_sec)
+print "time_s_upper_left_75:\t" + str(upper_left_75/ frame_per_sec)
 
 print "dist_upper_left:\t" + str(dist_upper_left/conversion_pixel_to_cm)
 print "dist_upper_left_25:\t" + str(dist_upper_left_25/conversion_pixel_to_cm)
@@ -505,10 +505,10 @@ print "\t".join(map(str,upper_left_lap_bout))
 
 
 print "----------------------------"
-print "lower_left:\t" + str(lower_left/ frame_per_sec)
-print "lower_left_25:\t" + str(lower_left_25 / frame_per_sec)
-print "lower_left_50:\t" + str(lower_left_50/ frame_per_sec)
-print "lower_left_75:\t" + str(lower_left_75/ frame_per_sec)
+print "time_s_lower_left:\t" + str(lower_left/ frame_per_sec)
+print "time_s_lower_left_25:\t" + str(lower_left_25 / frame_per_sec)
+print "time_s_lower_left_50:\t" + str(lower_left_50/ frame_per_sec)
+print "time_s_lower_left_75:\t" + str(lower_left_75/ frame_per_sec)
 
 print "dist_lower_left:\t" + str(dist_lower_left/conversion_pixel_to_cm)
 print "dist_lower_left_25:\t" + str(dist_lower_left_25/conversion_pixel_to_cm)
@@ -538,10 +538,10 @@ print "\t".join(map(str,lower_left_lap_bout))
 
 
 print "----------------------------"
-print "lower_right:\t" + str(lower_right/ frame_per_sec)
-print "lower_right_25:\t" + str(lower_right_25 / frame_per_sec)
-print "lower_right_50:\t" + str(lower_right_50/ frame_per_sec)
-print "lower_right_75:\t" + str(lower_right_75/ frame_per_sec)
+print "time_s_lower_right:\t" + str(lower_right/ frame_per_sec)
+print "time_s_lower_right_25:\t" + str(lower_right_25 / frame_per_sec)
+print "time_s_lower_right_50:\t" + str(lower_right_50/ frame_per_sec)
+print "time_s_lower_right_75:\t" + str(lower_right_75/ frame_per_sec)
 
 print "dist_lower_right:\t" + str(dist_lower_right/conversion_pixel_to_cm)
 print "dist_lower_right_25:\t" + str(dist_lower_right_25/conversion_pixel_to_cm)
