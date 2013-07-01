@@ -50,28 +50,34 @@ frame_per_sec = cap.get(CV_CAP_PROP_FPS)
 print frame_per_sec
 
 _,frame2 = cap.read()
-
+#frame2 = cv2.blur(frame2,(17,17))
 imgray = cv2.cvtColor(frame2,cv2.COLOR_BGR2GRAY)
-ret,thresh = cv2.threshold(imgray,210,255,0)
+ret,thresh = cv2.threshold(imgray,200,255,0)
 cv2.imwrite("gray_tra.png",thresh)
 contours,hierarchy = cv2.findContours(thresh,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
 num_p = 0
-sum_x = []
-sum_y = []
+all_x = []
+all_y = []
 for cnt in contours:
     for point in cnt:
         num_p = num_p + 1
-        sum_x.append(point[0][0])
-        sum_y.append(point[0][1])
-print np.median(sum_x)
-print np.median(sum_y)
+        x = point[0][0]
+        y = point[0][1]
+        if x > 20 and x < 640 and y > 20 and y < 460:
+            all_x.append(x)
+            all_y.append(y)
+print np.median(all_x)
+print np.median(all_y)
 
 
-#width = int(cap.get(3))
-#height = int(cap.get(4))
+actual_width = int(cap.get(3))
+actual_height = int(cap.get(4))
 
-width = 2*int(np.median(sum_x))
-height = 2*int(np.median(sum_y))
+width = 2*int(np.median(all_x))
+height = 2*int(np.median(all_y))
+
+diff_width = actual_width - width
+diff_height = actual_height - height
 
 
 def comp_tuple(mp,pt1,pt2):
@@ -95,10 +101,32 @@ perc_25_height = int((half_height-half_height*0.15)/2)
 bout_threshold = 11
 dist_threshold = 3
 conversion_pixel_to_cm = 10
-correction_width_inner = 20
-correction_width_outer = 40
-correction_height_inner = 5
-correction_height_outer = 5
+print diff_width
+print diff_height
+if diff_width <= 0:
+    correction_width_inner = int(-diff_width*20)
+    correction_width_outer = int(-diff_width*20)
+elif diff_width <= 10:
+    correction_width_inner = int(diff_width*10)
+    correction_width_outer = int(diff_width*10)
+else:
+    correction_width_inner = int(diff_width*1.5)
+    correction_width_outer = int(diff_width*1.7)
+if diff_height < 10:
+    correction_height_inner = -diff_height
+    correction_height_outer = -diff_height
+elif diff_height < 0:
+    correction_height_inner = -diff_height*2
+    correction_height_outer = -diff_height*2
+elif diff_height > 10:
+    correction_height_inner = -diff_height/2
+    correction_height_outer = -diff_height/2
+elif diff_height > 30:
+    correction_height_inner = -diff_height/5
+    correction_height_outer = -diff_height/5
+else:
+    correction_height_inner = diff_height
+    correction_height_outer = diff_height
 
 last_upper_left = None
 upper_left_i = None
@@ -147,12 +175,12 @@ dist_lower_left = dist_lower_left_75 = dist_lower_left_50 = dist_lower_left_25 =
 lower_left_point1 = tuple([0,half_height])
 lower_left_point2 = tuple([half_width,height])
 lower_left_last_known_point = lower_left_point1
-lower_left_75_point1 = tuple([perc_75_width+ correction_width_outer,half_height+perc_75_height+correction_height_inner])
-lower_left_75_point2 = tuple([half_width-perc_75_width+ correction_width_inner,height-perc_75_height+correction_height_outer])
-lower_left_50_point1 = tuple([perc_50_width+ correction_width_outer,half_height+perc_50_height+correction_height_inner])
-lower_left_50_point2 = tuple([half_width-perc_50_width+ correction_width_inner,height-perc_50_height+correction_height_outer])
-lower_left_25_point1 = tuple([perc_25_width+ correction_width_outer,half_height+perc_25_height+correction_height_inner])
-lower_left_25_point2 = tuple([half_width-perc_25_width+ correction_width_inner,height-perc_25_height+correction_height_outer])
+lower_left_75_point1 = tuple([perc_75_width+ correction_width_outer,half_height+perc_75_height-correction_height_inner])
+lower_left_75_point2 = tuple([half_width-perc_75_width+ correction_width_inner,height-perc_75_height-correction_height_outer])
+lower_left_50_point1 = tuple([perc_50_width+ correction_width_outer,half_height+perc_50_height-correction_height_inner])
+lower_left_50_point2 = tuple([half_width-perc_50_width+ correction_width_inner,height-perc_50_height-correction_height_outer])
+lower_left_25_point1 = tuple([perc_25_width+ correction_width_outer,half_height+perc_25_height-correction_height_inner])
+lower_left_25_point2 = tuple([half_width-perc_25_width+ correction_width_inner,height-perc_25_height-correction_height_outer])
 
 
 last_lower_right = None
@@ -166,12 +194,12 @@ dist_lower_right = dist_lower_right_75 = dist_lower_right_50 = dist_lower_right_
 lower_right_point1 = tuple([half_width,half_height])
 lower_right_point2 = tuple([width,height])
 lower_right_last_known_point = lower_right_point1
-lower_right_75_point1 = tuple([half_width+perc_75_width- correction_width_inner,half_height+perc_75_height+correction_height_inner])
-lower_right_75_point2 = tuple([width-perc_75_width- correction_width_outer ,height-perc_75_height+correction_height_outer])
-lower_right_50_point1 = tuple([half_width+perc_50_width-correction_width_inner,half_height+perc_50_height+correction_height_inner])
-lower_right_50_point2 = tuple([width-perc_50_width-correction_width_outer,height-perc_50_height+correction_height_outer])
-lower_right_25_point1 = tuple([half_width+perc_25_width-correction_width_inner,half_height+perc_25_height+correction_height_inner])
-lower_right_25_point2 = tuple([width-perc_25_width-correction_width_outer,height-perc_25_height+correction_height_outer])
+lower_right_75_point1 = tuple([half_width+perc_75_width- correction_width_inner,half_height+perc_75_height-correction_height_inner])
+lower_right_75_point2 = tuple([width-perc_75_width- correction_width_outer ,height-perc_75_height-correction_height_outer])
+lower_right_50_point1 = tuple([half_width+perc_50_width-correction_width_inner,half_height+perc_50_height-correction_height_inner])
+lower_right_50_point2 = tuple([width-perc_50_width-correction_width_outer,height-perc_50_height-correction_height_outer])
+lower_right_25_point1 = tuple([half_width+perc_25_width-correction_width_inner,half_height+perc_25_height-correction_height_inner])
+lower_right_25_point2 = tuple([width-perc_25_width-correction_width_outer,height-perc_25_height-correction_height_outer])
 
 
 
@@ -188,8 +216,8 @@ mid_points = []
 print half_width
 print half_height
 frame_number = cap.get(CV_CAP_PROP_POS_FRAMES)
-#while(frame_number < total_number_of_frames):
-while(frame_number < 250):
+while(frame_number < total_number_of_frames):
+#while(frame_number < 250):
     frame_number = cap.get(CV_CAP_PROP_POS_FRAMES)
     # read the frames
     _,frame = cap.read()
@@ -642,103 +670,103 @@ for i,f in enumerate(lower_right_lap_bout):
 #print "\t".join(map(str,upper_right_lap_bout))
 
 
-print "----------------------------"
-print "time_s_upper_left:\t" + str(upper_left/ frame_per_sec)
-print "time_s_upper_left_25:\t" + str(upper_left_25 / frame_per_sec)
-print "time_s_upper_left_50:\t" + str(upper_left_50/ frame_per_sec)
-print "time_s_upper_left_75:\t" + str(upper_left_75/ frame_per_sec)
-
-print "dist_upper_left:\t" + str(dist_upper_left/conversion_pixel_to_cm)
-print "dist_upper_left_25:\t" + str(dist_upper_left_25/conversion_pixel_to_cm)
-print "dist_upper_left_50:\t" + str(dist_upper_left_50/conversion_pixel_to_cm)
-print "dist_upper_left_75:\t" + str(dist_upper_left_75/conversion_pixel_to_cm)
-
-speed_upper_left = speed_upper_left_25 = speed_upper_left_50 = speed_upper_left_75 = 0
-if upper_left / frame_per_sec > 0:
-    speed_upper_left = dist_upper_left/conversion_pixel_to_cm / ( upper_left /frame_per_sec)
-if upper_left_25 / frame_per_sec > 0:
-    speed_upper_left_25 = dist_upper_left_25/conversion_pixel_to_cm/ (upper_left_25/frame_per_sec)
-if upper_left_50 / frame_per_sec > 0:
-    speed_upper_left_50 = dist_upper_left_50/conversion_pixel_to_cm/ (upper_left_50/frame_per_sec )
-if upper_left_75 / frame_per_sec > 0:
-    speed_upper_left_75 = dist_upper_left_75/conversion_pixel_to_cm/ (upper_left_75/ frame_per_sec )
-print "speed_upper_left:\t" + str(speed_upper_left)
-print "speed_upper_left_25:\t" + str(speed_upper_left_25)
-print "speed_upper_left_50:\t" + str(speed_upper_left_50)
-print "speed_upper_left_75:\t" + str(speed_upper_left_75)
-
-print "upper_left_num_bout:\t" + str(upper_left_num_bout)
-print "seconds in bout:\t" + str(upper_left_frame_bout / frame_per_sec)
-
-print "upper_left_distance_bout:\t" + str(upper_left_distance_bout/conversion_pixel_to_cm)
-print "upper_left_lap_bout:"
-print "\t".join(map(str,upper_left_lap_bout))
-
-
-print "----------------------------"
-print "time_s_lower_left:\t" + str(lower_left/ frame_per_sec)
-print "time_s_lower_left_25:\t" + str(lower_left_25 / frame_per_sec)
-print "time_s_lower_left_50:\t" + str(lower_left_50/ frame_per_sec)
-print "time_s_lower_left_75:\t" + str(lower_left_75/ frame_per_sec)
-
-print "dist_lower_left:\t" + str(dist_lower_left/conversion_pixel_to_cm)
-print "dist_lower_left_25:\t" + str(dist_lower_left_25/conversion_pixel_to_cm)
-print "dist_lower_left_50:\t" + str(dist_lower_left_50/conversion_pixel_to_cm)
-print "dist_lower_left_75:\t" + str(dist_lower_left_75/conversion_pixel_to_cm)
-
-speed_lower_left = speed_lower_left_25 = speed_lower_left_50 = speed_lower_left_75 = 0
-if lower_left / frame_per_sec > 0:
-    speed_lower_left = dist_lower_left/conversion_pixel_to_cm / ( lower_left /frame_per_sec)
-if lower_left_25 / frame_per_sec > 0:
-    speed_lower_left_25 = dist_lower_left_25/conversion_pixel_to_cm/ (lower_left_25/frame_per_sec)
-if lower_left_50 / frame_per_sec > 0:
-    speed_lower_left_50 = dist_lower_left_50/conversion_pixel_to_cm/ (lower_left_50/frame_per_sec )
-if lower_left_75 / frame_per_sec > 0:
-    speed_lower_left_75 = dist_lower_left_75/conversion_pixel_to_cm/ (lower_left_75/ frame_per_sec )
-print "speed_lower_left:\t" + str(speed_lower_left)
-print "speed_lower_left_25:\t" + str(speed_lower_left_25)
-print "speed_lower_left_50:\t" + str(speed_lower_left_50)
-print "speed_lower_left_75:\t" + str(speed_lower_left_75)
-
-print "lower_left_num_bout:\t" + str(lower_left_num_bout)
-print "seconds in bout:\t" + str(lower_left_frame_bout / frame_per_sec)
-
-print "lower_left_distance_bout:\t" + str(lower_left_distance_bout/conversion_pixel_to_cm)
-print "lower_left_lap_bout:"
-print "\t".join(map(str,lower_left_lap_bout))
-
-
-print "----------------------------"
-print "time_s_lower_right:\t" + str(lower_right/ frame_per_sec)
-print "time_s_lower_right_25:\t" + str(lower_right_25 / frame_per_sec)
-print "time_s_lower_right_50:\t" + str(lower_right_50/ frame_per_sec)
-print "time_s_lower_right_75:\t" + str(lower_right_75/ frame_per_sec)
-
-print "dist_lower_right:\t" + str(dist_lower_right/conversion_pixel_to_cm)
-print "dist_lower_right_25:\t" + str(dist_lower_right_25/conversion_pixel_to_cm)
-print "dist_lower_right_50:\t" + str(dist_lower_right_50/conversion_pixel_to_cm)
-print "dist_lower_right_75:\t" + str(dist_lower_right_75/conversion_pixel_to_cm)
-
-speed_lower_right = speed_lower_right_25 = speed_lower_right_50 = speed_lower_right_75 = 0
-if lower_right / frame_per_sec > 0:
-    speed_lower_right = dist_lower_right/conversion_pixel_to_cm / ( lower_right /frame_per_sec)
-if lower_right_25 / frame_per_sec > 0:
-    speed_lower_right_25 = dist_lower_right_25/conversion_pixel_to_cm/ (lower_right_25/frame_per_sec)
-if lower_right_50 / frame_per_sec > 0:
-    speed_lower_right_50 = dist_lower_right_50/conversion_pixel_to_cm/ (lower_right_50/frame_per_sec )
-if lower_right_75 / frame_per_sec > 0:
-    speed_lower_right_75 = dist_lower_right_75/conversion_pixel_to_cm/ (lower_right_75/ frame_per_sec )
-print "speed_lower_right:\t" + str(speed_lower_right)
-print "speed_lower_right_25:\t" + str(speed_lower_right_25)
-print "speed_lower_right_50:\t" + str(speed_lower_right_50)
-print "speed_lower_right_75:\t" + str(speed_lower_right_75)
-
-print "lower_right_num_bout:\t" + str(lower_right_num_bout)
-print "seconds in bout:\t" + str(lower_right_frame_bout / frame_per_sec)
-
-print "lower_right_distance_bout:\t" + str(lower_right_distance_bout/conversion_pixel_to_cm)
-print "lower_right_lap_bout:"
-print "\t".join(map(str,lower_right_lap_bout))
+#print "----------------------------"
+#print "time_s_upper_left:\t" + str(upper_left/ frame_per_sec)
+#print "time_s_upper_left_25:\t" + str(upper_left_25 / frame_per_sec)
+#print "time_s_upper_left_50:\t" + str(upper_left_50/ frame_per_sec)
+#print "time_s_upper_left_75:\t" + str(upper_left_75/ frame_per_sec)
+#
+#print "dist_upper_left:\t" + str(dist_upper_left/conversion_pixel_to_cm)
+#print "dist_upper_left_25:\t" + str(dist_upper_left_25/conversion_pixel_to_cm)
+#print "dist_upper_left_50:\t" + str(dist_upper_left_50/conversion_pixel_to_cm)
+#print "dist_upper_left_75:\t" + str(dist_upper_left_75/conversion_pixel_to_cm)
+#
+#speed_upper_left = speed_upper_left_25 = speed_upper_left_50 = speed_upper_left_75 = 0
+#if upper_left / frame_per_sec > 0:
+#    speed_upper_left = dist_upper_left/conversion_pixel_to_cm / ( upper_left /frame_per_sec)
+#if upper_left_25 / frame_per_sec > 0:
+#    speed_upper_left_25 = dist_upper_left_25/conversion_pixel_to_cm/ (upper_left_25/frame_per_sec)
+#if upper_left_50 / frame_per_sec > 0:
+#    speed_upper_left_50 = dist_upper_left_50/conversion_pixel_to_cm/ (upper_left_50/frame_per_sec )
+#if upper_left_75 / frame_per_sec > 0:
+#    speed_upper_left_75 = dist_upper_left_75/conversion_pixel_to_cm/ (upper_left_75/ frame_per_sec )
+#print "speed_upper_left:\t" + str(speed_upper_left)
+#print "speed_upper_left_25:\t" + str(speed_upper_left_25)
+#print "speed_upper_left_50:\t" + str(speed_upper_left_50)
+#print "speed_upper_left_75:\t" + str(speed_upper_left_75)
+#
+#print "upper_left_num_bout:\t" + str(upper_left_num_bout)
+#print "seconds in bout:\t" + str(upper_left_frame_bout / frame_per_sec)
+#
+#print "upper_left_distance_bout:\t" + str(upper_left_distance_bout/conversion_pixel_to_cm)
+#print "upper_left_lap_bout:"
+#print "\t".join(map(str,upper_left_lap_bout))
+#
+#
+#print "----------------------------"
+#print "time_s_lower_left:\t" + str(lower_left/ frame_per_sec)
+#print "time_s_lower_left_25:\t" + str(lower_left_25 / frame_per_sec)
+#print "time_s_lower_left_50:\t" + str(lower_left_50/ frame_per_sec)
+#print "time_s_lower_left_75:\t" + str(lower_left_75/ frame_per_sec)
+#
+#print "dist_lower_left:\t" + str(dist_lower_left/conversion_pixel_to_cm)
+#print "dist_lower_left_25:\t" + str(dist_lower_left_25/conversion_pixel_to_cm)
+#print "dist_lower_left_50:\t" + str(dist_lower_left_50/conversion_pixel_to_cm)
+#print "dist_lower_left_75:\t" + str(dist_lower_left_75/conversion_pixel_to_cm)
+#
+#speed_lower_left = speed_lower_left_25 = speed_lower_left_50 = speed_lower_left_75 = 0
+#if lower_left / frame_per_sec > 0:
+#    speed_lower_left = dist_lower_left/conversion_pixel_to_cm / ( lower_left /frame_per_sec)
+#if lower_left_25 / frame_per_sec > 0:
+#    speed_lower_left_25 = dist_lower_left_25/conversion_pixel_to_cm/ (lower_left_25/frame_per_sec)
+#if lower_left_50 / frame_per_sec > 0:
+#    speed_lower_left_50 = dist_lower_left_50/conversion_pixel_to_cm/ (lower_left_50/frame_per_sec )
+#if lower_left_75 / frame_per_sec > 0:
+#    speed_lower_left_75 = dist_lower_left_75/conversion_pixel_to_cm/ (lower_left_75/ frame_per_sec )
+#print "speed_lower_left:\t" + str(speed_lower_left)
+#print "speed_lower_left_25:\t" + str(speed_lower_left_25)
+#print "speed_lower_left_50:\t" + str(speed_lower_left_50)
+#print "speed_lower_left_75:\t" + str(speed_lower_left_75)
+#
+#print "lower_left_num_bout:\t" + str(lower_left_num_bout)
+#print "seconds in bout:\t" + str(lower_left_frame_bout / frame_per_sec)
+#
+#print "lower_left_distance_bout:\t" + str(lower_left_distance_bout/conversion_pixel_to_cm)
+#print "lower_left_lap_bout:"
+#print "\t".join(map(str,lower_left_lap_bout))
+#
+#
+#print "----------------------------"
+#print "time_s_lower_right:\t" + str(lower_right/ frame_per_sec)
+#print "time_s_lower_right_25:\t" + str(lower_right_25 / frame_per_sec)
+#print "time_s_lower_right_50:\t" + str(lower_right_50/ frame_per_sec)
+#print "time_s_lower_right_75:\t" + str(lower_right_75/ frame_per_sec)
+#
+#print "dist_lower_right:\t" + str(dist_lower_right/conversion_pixel_to_cm)
+#print "dist_lower_right_25:\t" + str(dist_lower_right_25/conversion_pixel_to_cm)
+#print "dist_lower_right_50:\t" + str(dist_lower_right_50/conversion_pixel_to_cm)
+#print "dist_lower_right_75:\t" + str(dist_lower_right_75/conversion_pixel_to_cm)
+#
+#speed_lower_right = speed_lower_right_25 = speed_lower_right_50 = speed_lower_right_75 = 0
+#if lower_right / frame_per_sec > 0:
+#    speed_lower_right = dist_lower_right/conversion_pixel_to_cm / ( lower_right /frame_per_sec)
+#if lower_right_25 / frame_per_sec > 0:
+#    speed_lower_right_25 = dist_lower_right_25/conversion_pixel_to_cm/ (lower_right_25/frame_per_sec)
+#if lower_right_50 / frame_per_sec > 0:
+#    speed_lower_right_50 = dist_lower_right_50/conversion_pixel_to_cm/ (lower_right_50/frame_per_sec )
+#if lower_right_75 / frame_per_sec > 0:
+#    speed_lower_right_75 = dist_lower_right_75/conversion_pixel_to_cm/ (lower_right_75/ frame_per_sec )
+#print "speed_lower_right:\t" + str(speed_lower_right)
+#print "speed_lower_right_25:\t" + str(speed_lower_right_25)
+#print "speed_lower_right_50:\t" + str(speed_lower_right_50)
+#print "speed_lower_right_75:\t" + str(speed_lower_right_75)
+#
+#print "lower_right_num_bout:\t" + str(lower_right_num_bout)
+#print "seconds in bout:\t" + str(lower_right_frame_bout / frame_per_sec)
+#
+#print "lower_right_distance_bout:\t" + str(lower_right_distance_bout/conversion_pixel_to_cm)
+#print "lower_right_lap_bout:"
+#print "\t".join(map(str,lower_right_lap_bout))
 
 wb.save(results_excel)
 
