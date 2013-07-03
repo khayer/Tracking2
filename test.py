@@ -45,8 +45,10 @@ print sample_name
 print cap.isOpened()
 
 total_number_of_frames = cap.get(CV_CAP_PROP_FRAME_COUNT)
+print "Total number of frames"
 print total_number_of_frames
 frame_per_sec = cap.get(CV_CAP_PROP_FPS)
+print "Frame per sec"
 print frame_per_sec
 
 _,frame2 = cap.read()
@@ -254,17 +256,17 @@ while(frame_number < total_number_of_frames):
 
     max_area = 0
     contours2 = contours
-    i = 0
-    for cnt in contours:
-        area = cv2.contourArea(cnt)
-        #print len(cnt)
-        cnt2 = cv2.convexHull(cnt)
-        #print len(cnt2)
-        contours2[i] = cnt2
-        i = i+1
-        if area > max_area:
-            max_area = area
-            best_cnt = cnt
+    #i = 0
+    #for cnt in contours:
+    #    area = cv2.contourArea(cnt)
+    #    #print len(cnt)
+    #    cnt2 = cv2.convexHull(cnt)
+    #    #print len(cnt2)
+    #    contours2[i] = cnt2
+    #    i = i+1
+    #    if area > max_area:
+    #        max_area = area
+    #        best_cnt = cnt
 
     cv2.drawContours(frame,contours2,-1,cv.CV_RGB(255,255,0),1)
     start = tuple([0,half_height])
@@ -307,9 +309,11 @@ while(frame_number < total_number_of_frames):
         cv2.circle(frame,mid_point, 1, cv.CV_RGB(255,0,0))
 
     left_upper_bool = left_lower_bool = right_upper_bool = right_lower_bool = 1
+    if len(mid_points) >= 5:
+            print "ERROR!!!!"
     for mp in mid_points:
 
-        if comp_tuple(mp,upper_left_point1,upper_left_point2):
+        if comp_tuple(mp,upper_left_point1,upper_left_point2) and left_upper_bool == 1:
             #var1 = 4 if var1 is None else var1
             left_upper_bool = 0
             last_upper_left = last_upper_left or mp
@@ -344,7 +348,7 @@ while(frame_number < total_number_of_frames):
             last_upper_left = mp
             upper_left_last_known_point = mp
 
-        if comp_tuple(mp,upper_right_point1,upper_right_point2):
+        if comp_tuple(mp,upper_right_point1,upper_right_point2) and right_upper_bool ==1 :
             right_upper_bool = 0
             last_upper_right = last_upper_right or mp
             distance = dist(last_upper_right,mp)
@@ -377,7 +381,7 @@ while(frame_number < total_number_of_frames):
             last_upper_right = mp
             upper_right_last_known_point = mp
 
-        if comp_tuple(mp,lower_left_point1,lower_left_point2):
+        if comp_tuple(mp,lower_left_point1,lower_left_point2) and left_lower_bool ==1:
             left_lower_bool = 0
             last_lower_left = last_lower_left or mp
             distance = dist(last_lower_left,mp)
@@ -410,7 +414,7 @@ while(frame_number < total_number_of_frames):
             last_lower_left = mp
             lower_left_last_known_point = mp
 
-        if comp_tuple(mp,lower_right_point1,lower_right_point2):
+        if comp_tuple(mp,lower_right_point1,lower_right_point2) and right_lower_bool:
             right_lower_bool = 0
             last_lower_right = last_lower_right or mp
             distance = dist(last_lower_right,mp)
