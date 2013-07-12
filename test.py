@@ -47,7 +47,7 @@ print cap.isOpened()
 total_number_of_frames = cap.get(CV_CAP_PROP_FRAME_COUNT)
 print "Total number of frames"
 print total_number_of_frames
-frame_per_sec = cap.get(CV_CAP_PROP_FPS)
+frame_per_sec = 30.03888889
 print "Frame per sec"
 print frame_per_sec
 
@@ -108,9 +108,12 @@ print diff_height
 if diff_width <= 0:
     correction_width_inner = int(-diff_width*20)
     correction_width_outer = int(-diff_width*20)
-elif diff_width <= 10:
+elif diff_width < 10:
     correction_width_inner = int(diff_width*10)
     correction_width_outer = int(diff_width*10)
+elif diff_width >= 10:
+    correction_width_inner = int(diff_width)
+    correction_width_outer = int(diff_width)
 else:
     correction_width_inner = int(diff_width*1.5)
     correction_width_outer = int(diff_width*1.7)
@@ -120,11 +123,11 @@ if diff_height < 10:
 elif diff_height < 0:
     correction_height_inner = -diff_height*2
     correction_height_outer = -diff_height*2
-elif diff_height > 10:
+elif diff_height > 10 and diff_height <= 30:
     correction_height_inner = -diff_height/2
     correction_height_outer = -diff_height/2
 elif diff_height > 30:
-    correction_height_inner = -diff_height/5
+    correction_height_inner = diff_height/10
     correction_height_outer = -diff_height/5
 else:
     correction_height_inner = diff_height
@@ -218,9 +221,15 @@ mid_points = []
 print half_width
 print half_height
 frame_number = cap.get(CV_CAP_PROP_POS_FRAMES)
+#frame_per_sec = 0
 while(frame_number < total_number_of_frames):
 #while(frame_number < 250):
     frame_number = cap.get(CV_CAP_PROP_POS_FRAMES)
+    #CV_CAP_PROP_POS_MSEC
+    #l = cap.get(CV_CAP_PROP_POS_MSEC)
+    #if l <= 1000:
+    #    print l
+    #    frame_per_sec += 1.0
     # read the frames
     _,frame = cap.read()
     percent = frame_number/total_number_of_frames * 100
@@ -309,8 +318,6 @@ while(frame_number < total_number_of_frames):
         cv2.circle(frame,mid_point, 1, cv.CV_RGB(255,0,0))
 
     left_upper_bool = left_lower_bool = right_upper_bool = right_lower_bool = 1
-    if len(mid_points) >= 5:
-            print "ERROR!!!!"
     for mp in mid_points:
 
         if comp_tuple(mp,upper_left_point1,upper_left_point2) and left_upper_bool == 1:
