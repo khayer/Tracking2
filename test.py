@@ -221,6 +221,7 @@ mid_points = []
 print half_width
 print half_height
 frame_number = cap.get(CV_CAP_PROP_POS_FRAMES)
+time_in_msec = 0
 #frame_per_sec = 0
 while(frame_number < total_number_of_frames):
 #while(frame_number < 250):
@@ -232,6 +233,8 @@ while(frame_number < total_number_of_frames):
     #    frame_per_sec += 1.0
     # read the frames
     _,frame = cap.read()
+    if cap.get(CV_CAP_PROP_POS_MSEC) > 0.0:
+        time_in_msec = cap.get(CV_CAP_PROP_POS_MSEC) 
     percent = frame_number/total_number_of_frames * 100
     l = int(percent/2)
     if l%2==0:
@@ -509,6 +512,11 @@ while(frame_number < total_number_of_frames):
 cv2.imwrite(sample_name + "_tra.png",frame2)
 # Clean up everything before leaving
 cv2.destroyAllWindows()
+
+
+#all_frames = upper_left + upper_left_75 + upper_left_50 + upper_left_25
+#frame_per_sec = 360000/all_frames
+#print frame_per_sec
 cap.release()
 
 
