@@ -95,6 +95,10 @@ height = 2*int(np.median(all_y))
 diff_width = actual_width - width
 diff_height = actual_height - height
 
+cv_rect_obj = imgray[0:height,0:width/2]
+cv2.imwrite("gray_test.png",cv_rect_obj)
+cv_rect_obj2 = imgray[0:height,width/2:width]
+cv2.imwrite("gray_test2.png",cv_rect_obj2)
 
 def comp_tuple(mp,pt1,pt2):
     return mp[0] >= pt1[0] and mp[0] <= pt2[0] and mp[1] >= pt1[1] and mp[1] <= pt2[1]
@@ -108,11 +112,11 @@ half_width = int(width/2)
 half_height = int(height/2)
 
 perc_75_width = int((half_width-half_width*0.55)/2)
-perc_75_height = int((half_height-half_height*0.55)/2)
+perc_75_height = int((height-height*0.55)/2)
 perc_50_width = int((half_width-half_width*0.35)/2)
-perc_50_height = int((half_height-half_height*0.35)/2)
+perc_50_height = int((height-height*0.35)/2)
 perc_25_width = int((half_width-half_width*0.15)/2)
-perc_25_height = int((half_height-half_height*0.15)/2)
+perc_25_height = int((height-height*0.15)/2)
 
 bout_threshold = 11
 dist_threshold = 3
@@ -156,7 +160,7 @@ upper_left_lap_bout = []
 upper_left = upper_left_75 = upper_left_50 = upper_left_25 = 0
 dist_upper_left = dist_upper_left_75 = dist_upper_left_50 = dist_upper_left_25 = 0
 upper_left_point1 = tuple([0,0])
-upper_left_point2 = tuple([half_width,half_height])
+upper_left_point2 = tuple([half_width,height])
 upper_left_last_known_point = upper_left_point1
 upper_left_75_point1 = tuple([perc_75_width+ correction_width_outer,perc_75_height+correction_height_outer])
 upper_left_75_point2 = tuple([half_width-perc_75_width+ correction_width_inner,half_height-perc_75_height+correction_height_inner])
@@ -174,7 +178,7 @@ upper_right_lap_bout = []
 upper_right = upper_right_75 = upper_right_50 = upper_right_25 = 0
 dist_upper_right = dist_upper_right_75 = dist_upper_right_50 = dist_upper_right_25 = 0
 upper_right_point1 = tuple([half_width,0])
-upper_right_point2 = tuple([width,half_height])
+upper_right_point2 = tuple([width,height])
 upper_right_last_known_point = upper_right_point1
 upper_right_75_point1 = tuple([half_width+perc_75_width- correction_width_inner,perc_75_height+correction_height_outer])
 upper_right_75_point2 = tuple([width-perc_75_width- correction_width_outer,half_height-perc_75_height+correction_height_inner])
@@ -183,42 +187,42 @@ upper_right_50_point2 = tuple([width-perc_50_width- correction_width_outer,half_
 upper_right_25_point1 = tuple([half_width+perc_25_width- correction_width_inner,perc_25_height+correction_height_outer])
 upper_right_25_point2 = tuple([width-perc_25_width- correction_width_outer,half_height-perc_25_height+correction_height_inner])
 
-last_lower_left = None
-lower_left_i = None
-lower_left_num_bout = 0
-lower_left_frame_bout = 0
-lower_left_distance_bout = 0
-lower_left_lap_bout = []
-lower_left = lower_left_75 = lower_left_50 = lower_left_25 = 0
-dist_lower_left = dist_lower_left_75 = dist_lower_left_50 = dist_lower_left_25 = 0
-lower_left_point1 = tuple([0,half_height])
-lower_left_point2 = tuple([half_width,height])
-lower_left_last_known_point = lower_left_point1
-lower_left_75_point1 = tuple([perc_75_width+ correction_width_outer,half_height+perc_75_height-correction_height_inner])
-lower_left_75_point2 = tuple([half_width-perc_75_width+ correction_width_inner,height-perc_75_height-correction_height_outer])
-lower_left_50_point1 = tuple([perc_50_width+ correction_width_outer,half_height+perc_50_height-correction_height_inner])
-lower_left_50_point2 = tuple([half_width-perc_50_width+ correction_width_inner,height-perc_50_height-correction_height_outer])
-lower_left_25_point1 = tuple([perc_25_width+ correction_width_outer,half_height+perc_25_height-correction_height_inner])
-lower_left_25_point2 = tuple([half_width-perc_25_width+ correction_width_inner,height-perc_25_height-correction_height_outer])
+#last_lower_left = None
+#lower_left_i = None
+#lower_left_num_bout = 0
+#lower_left_frame_bout = 0
+#lower_left_distance_bout = 0
+#lower_left_lap_bout = []
+#lower_left = lower_left_75 = lower_left_50 = lower_left_25 = 0
+#dist_lower_left = dist_lower_left_75 = dist_lower_left_50 = dist_lower_left_25 = 0
+#lower_left_point1 = tuple([0,half_height])
+#lower_left_point2 = tuple([half_width,height])
+#lower_left_last_known_point = lower_left_point1
+#lower_left_75_point1 = tuple([perc_75_width+ correction_width_outer,half_height+perc_75_height-correction_height_inner])
+#lower_left_75_point2 = tuple([half_width-perc_75_width+ correction_width_inner,height-perc_75_height-correction_height_outer])
+#lower_left_50_point1 = tuple([perc_50_width+ correction_width_outer,half_height+perc_50_height-correction_height_inner])
+#lower_left_50_point2 = tuple([half_width-perc_50_width+ correction_width_inner,height-perc_50_height-correction_height_outer])
+#lower_left_25_point1 = tuple([perc_25_width+ correction_width_outer,half_height+perc_25_height-correction_height_inner])
+#lower_left_25_point2 = tuple([half_width-perc_25_width+ correction_width_inner,height-perc_25_height-correction_height_outer])
 
 
-last_lower_right = None
-lower_right_i = None
-lower_right_num_bout = 0
-lower_right_frame_bout = 0
-lower_right_distance_bout = 0
-lower_right_lap_bout = []
-lower_right = lower_right_75 = lower_right_50 = lower_right_25 = 0
-dist_lower_right = dist_lower_right_75 = dist_lower_right_50 = dist_lower_right_25 = 0
-lower_right_point1 = tuple([half_width,half_height])
-lower_right_point2 = tuple([width,height])
-lower_right_last_known_point = lower_right_point1
-lower_right_75_point1 = tuple([half_width+perc_75_width- correction_width_inner,half_height+perc_75_height-correction_height_inner])
-lower_right_75_point2 = tuple([width-perc_75_width- correction_width_outer ,height-perc_75_height-correction_height_outer])
-lower_right_50_point1 = tuple([half_width+perc_50_width-correction_width_inner,half_height+perc_50_height-correction_height_inner])
-lower_right_50_point2 = tuple([width-perc_50_width-correction_width_outer,height-perc_50_height-correction_height_outer])
-lower_right_25_point1 = tuple([half_width+perc_25_width-correction_width_inner,half_height+perc_25_height-correction_height_inner])
-lower_right_25_point2 = tuple([width-perc_25_width-correction_width_outer,height-perc_25_height-correction_height_outer])
+#last_lower_right = None
+#lower_right_i = None
+#lower_right_num_bout = 0
+#lower_right_frame_bout = 0
+#lower_right_distance_bout = 0
+#lower_right_lap_bout = []
+#lower_right = lower_right_75 = lower_right_50 = lower_right_25 = 0
+#dist_lower_right = dist_lower_right_75 = dist_lower_right_50 = dist_lower_right_25 = 0
+#lower_right_point1 = tuple([half_width,half_height])
+#lower_right_point2 = tuple([width,height])
+#lower_right_last_known_point = lower_right_point1
+#lower_right_75_point1 = tuple([half_width+perc_75_width- correction_width_inner,half_height+perc_75_height-correction_height_inner])
+#lower_right_75_point2 = tuple([width-perc_75_width- correction_width_outer ,height-perc_75_height-correction_height_outer])
+#lower_right_50_point1 = tuple([half_width+perc_50_width-correction_width_inner,half_height+perc_50_height-correction_height_inner])
+#lower_right_50_point2 = tuple([width-perc_50_width-correction_width_outer,height-perc_50_height-correction_height_outer])
+#lower_right_25_point1 = tuple([half_width+perc_25_width-correction_width_inner,half_height+perc_25_height-correction_height_inner])
+#lower_right_25_point2 = tuple([width-perc_25_width-correction_width_outer,height-perc_25_height-correction_height_outer])
 
 
 
@@ -246,6 +250,8 @@ while(frame_number < total_number_of_frames):
     #    print l
     #    frame_per_sec += 1.0
     # read the frames
+    frame_number = int(frame_number+100)
+    cap.set(CV_CAP_PROP_POS_FRAMES,frame_number)
     _,frame = cap.read()
     if cap.get(CV_CAP_PROP_POS_MSEC) > 0.0:
         time_in_msec = cap.get(CV_CAP_PROP_POS_MSEC)
@@ -309,12 +315,12 @@ while(frame_number < total_number_of_frames):
     cv2.rectangle(frame,upper_right_75_point1,upper_right_75_point2,cv.CV_RGB(255,0,0))
     cv2.rectangle(frame,upper_right_50_point1,upper_right_50_point2,cv.CV_RGB(255,0,0))
     cv2.rectangle(frame,upper_right_25_point1,upper_right_25_point2,cv.CV_RGB(255,0,0))
-    cv2.rectangle(frame,lower_left_75_point1,lower_left_75_point2,cv.CV_RGB(0,0,255))
-    cv2.rectangle(frame,lower_left_50_point1,lower_left_50_point2,cv.CV_RGB(0,0,255))
-    cv2.rectangle(frame,lower_left_25_point1,lower_left_25_point2,cv.CV_RGB(0,0,255))
-    cv2.rectangle(frame,lower_right_75_point1,lower_right_75_point2,cv.CV_RGB(0,255,0))
-    cv2.rectangle(frame,lower_right_50_point1,lower_right_50_point2,cv.CV_RGB(0,255,0))
-    cv2.rectangle(frame,lower_right_25_point1,lower_right_25_point2,cv.CV_RGB(0,255,0))
+    #cv2.rectangle(frame,lower_left_75_point1,lower_left_75_point2,cv.CV_RGB(0,0,255))
+    #cv2.rectangle(frame,lower_left_50_point1,lower_left_50_point2,cv.CV_RGB(0,0,255))
+    #cv2.rectangle(frame,lower_left_25_point1,lower_left_25_point2,cv.CV_RGB(0,0,255))
+    #cv2.rectangle(frame,lower_right_75_point1,lower_right_75_point2,cv.CV_RGB(0,255,0))
+    #cv2.rectangle(frame,lower_right_50_point1,lower_right_50_point2,cv.CV_RGB(0,255,0))
+    #cv2.rectangle(frame,lower_right_25_point1,lower_right_25_point2,cv.CV_RGB(0,255,0))
 
     mid_points = []
     for cnt in contours2:
@@ -405,90 +411,90 @@ while(frame_number < total_number_of_frames):
             last_upper_right = mp
             upper_right_last_known_point = mp
 
-        if comp_tuple(mp,lower_left_point1,lower_left_point2) and left_lower_bool ==1:
-            left_lower_bool = 0
-            last_lower_left = last_lower_left or mp
-            distance = dist(last_lower_left,mp)
-            if distance > dist_threshold:
-                lower_left_i = 0 or lower_left_i
-                lower_left_i = lower_left_i + 1
-                if lower_left_i == bout_threshold:
-                    lower_left_num_bout = lower_left_num_bout + 1
-                    lower_left_lap_bout.append(0)
-                if lower_left_i >= bout_threshold:
-                    cv2.circle(frame,mp, 5, cv.CV_RGB(0,255,0))
-                    lower_left_frame_bout = lower_left_frame_bout + 1
-                    lower_left_distance_bout = lower_left_distance_bout + distance
-                    lower_left_lap_bout[-1] = lower_left_lap_bout[-1] +1
-            else:
-                distance = 0
-                lower_left_i = 0
-            if comp_tuple(mp,lower_left_25_point1,lower_left_25_point2):
-                dist_lower_left_25 = dist_lower_left_25 + distance
-                lower_left_25 = lower_left_25 + 1
-            elif comp_tuple(mp,lower_left_50_point1,lower_left_50_point2):
-                dist_lower_left_50 = dist_lower_left_50 + distance
-                lower_left_50 = lower_left_50 + 1
-            elif comp_tuple(mp,lower_left_75_point1,lower_left_75_point2):
-                dist_lower_left_75 = dist_lower_left_75 + distance
-                lower_left_75 = lower_left_75 + 1
-            else:
-                lower_left = lower_left + 1
-                dist_lower_left = dist_lower_left + distance
-            last_lower_left = mp
-            lower_left_last_known_point = mp
+     # if comp_tuple(mp,lower_left_point1,lower_left_point2) and left_lower_bool ==1:
+     #     left_lower_bool = 0
+     #     last_lower_left = last_lower_left or mp
+     #     distance = dist(last_lower_left,mp)
+     #     if distance > dist_threshold:
+     #         lower_left_i = 0 or lower_left_i
+     #         lower_left_i = lower_left_i + 1
+     #         if lower_left_i == bout_threshold:
+     #             lower_left_num_bout = lower_left_num_bout + 1
+     #             lower_left_lap_bout.append(0)
+     #         if lower_left_i >= bout_threshold:
+     #             cv2.circle(frame,mp, 5, cv.CV_RGB(0,255,0))
+     #             lower_left_frame_bout = lower_left_frame_bout + 1
+     #             lower_left_distance_bout = lower_left_distance_bout + distance
+     #             lower_left_lap_bout[-1] = lower_left_lap_bout[-1] +1
+     #     else:
+     #         distance = 0
+     #         lower_left_i = 0
+     #     if comp_tuple(mp,lower_left_25_point1,lower_left_25_point2):
+     #         dist_lower_left_25 = dist_lower_left_25 + distance
+     #         lower_left_25 = lower_left_25 + 1
+     #     elif comp_tuple(mp,lower_left_50_point1,lower_left_50_point2):
+     #         dist_lower_left_50 = dist_lower_left_50 + distance
+     #         lower_left_50 = lower_left_50 + 1
+     #     elif comp_tuple(mp,lower_left_75_point1,lower_left_75_point2):
+     #         dist_lower_left_75 = dist_lower_left_75 + distance
+     #         lower_left_75 = lower_left_75 + 1
+     #     else:
+     #         lower_left = lower_left + 1
+     #         dist_lower_left = dist_lower_left + distance
+     #     last_lower_left = mp
+     #     lower_left_last_known_point = mp
 
-        if comp_tuple(mp,lower_right_point1,lower_right_point2) and right_lower_bool:
-            right_lower_bool = 0
-            last_lower_right = last_lower_right or mp
-            distance = dist(last_lower_right,mp)
-            if distance > dist_threshold:
-                lower_right_i = 0 or lower_right_i
-                lower_right_i = lower_right_i + 1
-                if lower_right_i == bout_threshold:
-                    lower_right_num_bout = lower_right_num_bout + 1
-                    lower_right_lap_bout.append(0)
-                if lower_right_i >= bout_threshold:
-                    cv2.circle(frame,mp, 5, cv.CV_RGB(255,255,0))
-                    lower_right_frame_bout = lower_right_frame_bout + 1
-                    lower_right_distance_bout = lower_right_distance_bout + distance
-                    lower_right_lap_bout[-1] = lower_right_lap_bout[-1] +1
-            else:
-                distance = 0
-                lower_right_i = 0
-            if comp_tuple(mp,lower_right_25_point1,lower_right_25_point2):
-                dist_lower_right_25 = dist_lower_right_25 + distance
-                lower_right_25 = lower_right_25 + 1
-            elif comp_tuple(mp,lower_right_50_point1,lower_right_50_point2):
-                dist_lower_right_50 = dist_lower_right_50 + distance
-                lower_right_50 = lower_right_50 + 1
-            elif comp_tuple(mp,lower_right_75_point1,lower_right_75_point2):
-                dist_lower_right_75 = dist_lower_right_75 + distance
-                lower_right_75 = lower_right_75 + 1
-            else:
-                lower_right = lower_right + 1
-                dist_lower_right = dist_lower_right + distance
-            last_lower_right = mp
-    if left_lower_bool == 1:
-        mp = lower_left_last_known_point
-        if comp_tuple(mp,lower_left_25_point1,lower_left_25_point2):
-            lower_left_25 = lower_left_25 + 1
-        elif comp_tuple(mp,lower_right_50_point1,lower_right_50_point2):
-            lower_left_50 = lower_left_50 + 1
-        elif comp_tuple(mp,lower_right_75_point1,lower_right_75_point2):
-            lower_left_75 = lower_left_75 + 1
-        else:
-            lower_left = lower_left + 1
-    if right_lower_bool == 1:
-        mp = lower_right_last_known_point
-        if comp_tuple(mp,lower_right_25_point1,lower_right_25_point2):
-            lower_right_25 = lower_right_25 + 1
-        elif comp_tuple(mp,lower_right_50_point1,lower_right_50_point2):
-            lower_right_50 = lower_right_50 + 1
-        elif comp_tuple(mp,lower_right_75_point1,lower_right_75_point2):
-            lower_right_75 = lower_right_75 + 1
-        else:
-            lower_right = lower_right + 1
+     # if comp_tuple(mp,lower_right_point1,lower_right_point2) and right_lower_bool:
+     #     right_lower_bool = 0
+     #     last_lower_right = last_lower_right or mp
+     #     distance = dist(last_lower_right,mp)
+     #     if distance > dist_threshold:
+     #         lower_right_i = 0 or lower_right_i
+     #         lower_right_i = lower_right_i + 1
+     #         if lower_right_i == bout_threshold:
+     #             lower_right_num_bout = lower_right_num_bout + 1
+     #             lower_right_lap_bout.append(0)
+     #         if lower_right_i >= bout_threshold:
+     #             cv2.circle(frame,mp, 5, cv.CV_RGB(255,255,0))
+     #             lower_right_frame_bout = lower_right_frame_bout + 1
+     #             lower_right_distance_bout = lower_right_distance_bout + distance
+     #             lower_right_lap_bout[-1] = lower_right_lap_bout[-1] +1
+     #     else:
+     #         distance = 0
+     #         lower_right_i = 0
+     #     if comp_tuple(mp,lower_right_25_point1,lower_right_25_point2):
+     #         dist_lower_right_25 = dist_lower_right_25 + distance
+     #         lower_right_25 = lower_right_25 + 1
+     #     elif comp_tuple(mp,lower_right_50_point1,lower_right_50_point2):
+     #         dist_lower_right_50 = dist_lower_right_50 + distance
+     #         lower_right_50 = lower_right_50 + 1
+     #     elif comp_tuple(mp,lower_right_75_point1,lower_right_75_point2):
+     #         dist_lower_right_75 = dist_lower_right_75 + distance
+     #         lower_right_75 = lower_right_75 + 1
+     #     else:
+     #         lower_right = lower_right + 1
+     #         dist_lower_right = dist_lower_right + distance
+     #     last_lower_right = mp
+   # if left_lower_bool == 1:
+   #     mp = lower_left_last_known_point
+   #     if comp_tuple(mp,lower_left_25_point1,lower_left_25_point2):
+   #         lower_left_25 = lower_left_25 + 1
+   #     elif comp_tuple(mp,lower_right_50_point1,lower_right_50_point2):
+   #         lower_left_50 = lower_left_50 + 1
+   #     elif comp_tuple(mp,lower_right_75_point1,lower_right_75_point2):
+   #         lower_left_75 = lower_left_75 + 1
+   #     else:
+   #         lower_left = lower_left + 1
+   # if right_lower_bool == 1:
+   #     mp = lower_right_last_known_point
+   #     if comp_tuple(mp,lower_right_25_point1,lower_right_25_point2):
+   #         lower_right_25 = lower_right_25 + 1
+   #     elif comp_tuple(mp,lower_right_50_point1,lower_right_50_point2):
+   #         lower_right_50 = lower_right_50 + 1
+   #     elif comp_tuple(mp,lower_right_75_point1,lower_right_75_point2):
+   #         lower_right_75 = lower_right_75 + 1
+   #     else:
+   #         lower_right = lower_right + 1
     if left_upper_bool == 1:
         mp = upper_left_last_known_point
         if comp_tuple(mp,upper_left_25_point1,upper_left_25_point2):
@@ -614,70 +620,70 @@ for i,f in enumerate(upper_right_lap_bout):
     w_sheet.write(r_sheet.nrows+3,i+16,f)
 
 ### LOWER LEFT
-w_sheet.write(r_sheet.nrows+4,0,"lower_left")
-# TIME
-w_sheet.write(r_sheet.nrows+4,1,(lower_left    / frame_per_sec))
-w_sheet.write(r_sheet.nrows+4,2,(lower_left_75 / frame_per_sec))
-w_sheet.write(r_sheet.nrows+4,3,(lower_left_50 / frame_per_sec))
-w_sheet.write(r_sheet.nrows+4,4,(lower_left_25 / frame_per_sec))
-# DISTANCE
-w_sheet.write(r_sheet.nrows+4,5,(dist_lower_left /conversion_pixel_to_cm))
-w_sheet.write(r_sheet.nrows+4,6,(dist_lower_left_75 / conversion_pixel_to_cm))
-w_sheet.write(r_sheet.nrows+4,7,(dist_lower_left_50 / conversion_pixel_to_cm))
-w_sheet.write(r_sheet.nrows+4,8,(dist_lower_left_25 / conversion_pixel_to_cm))
-# SPEED
-speed_lower_left = speed_lower_left_25 = speed_lower_left_50 = speed_lower_left_75 = 0
-if lower_left / frame_per_sec > 0:
-    speed_lower_left = dist_lower_left/conversion_pixel_to_cm / ( lower_left /frame_per_sec)
-if lower_left_25 / frame_per_sec > 0:
-    speed_lower_left_25 = dist_lower_left_25/conversion_pixel_to_cm/ (lower_left_25/frame_per_sec)
-if lower_left_50 / frame_per_sec > 0:
-    speed_lower_left_50 = dist_lower_left_50/conversion_pixel_to_cm/ (lower_left_50/frame_per_sec )
-if lower_left_75 / frame_per_sec > 0:
-    speed_lower_left_75 = dist_lower_left_75/conversion_pixel_to_cm/ (lower_left_75/ frame_per_sec )
-w_sheet.write(r_sheet.nrows+4,9,(speed_lower_left))
-w_sheet.write(r_sheet.nrows+4,10,(speed_lower_left_75))
-w_sheet.write(r_sheet.nrows+4,11,(speed_lower_left_50))
-w_sheet.write(r_sheet.nrows+4,12,(speed_lower_left_25))
-# BOUTS
-w_sheet.write(r_sheet.nrows+4,13,(lower_left_num_bout))
-w_sheet.write(r_sheet.nrows+4,14,(lower_left_frame_bout / frame_per_sec))
-w_sheet.write(r_sheet.nrows+4,15,(lower_left_distance_bout/conversion_pixel_to_cm))
-for i,f in enumerate(lower_left_lap_bout):
-    w_sheet.write(r_sheet.nrows+4,i+16,f)
-
-### UPPER LEFT
-w_sheet.write(r_sheet.nrows+5,0,"lower_right")
-# TIME
-w_sheet.write(r_sheet.nrows+5,1,(lower_right    / frame_per_sec))
-w_sheet.write(r_sheet.nrows+5,2,(lower_right_75 / frame_per_sec))
-w_sheet.write(r_sheet.nrows+5,3,(lower_right_50 / frame_per_sec))
-w_sheet.write(r_sheet.nrows+5,4,(lower_right_25 / frame_per_sec))
-# DISTANCE
-w_sheet.write(r_sheet.nrows+5,5,(dist_lower_right /conversion_pixel_to_cm))
-w_sheet.write(r_sheet.nrows+5,6,(dist_lower_right_75 / conversion_pixel_to_cm))
-w_sheet.write(r_sheet.nrows+5,7,(dist_lower_right_50 / conversion_pixel_to_cm))
-w_sheet.write(r_sheet.nrows+5,8,(dist_lower_right_25 / conversion_pixel_to_cm))
-# SPEED
-speed_lower_right = speed_lower_right_25 = speed_lower_right_50 = speed_lower_right_75 = 0
-if lower_right / frame_per_sec > 0:
-    speed_lower_right = dist_lower_right/conversion_pixel_to_cm / ( lower_right /frame_per_sec)
-if lower_right_25 / frame_per_sec > 0:
-    speed_lower_right_25 = dist_lower_right_25/conversion_pixel_to_cm/ (lower_right_25/frame_per_sec)
-if lower_right_50 / frame_per_sec > 0:
-    speed_lower_right_50 = dist_lower_right_50/conversion_pixel_to_cm/ (lower_right_50/frame_per_sec )
-if lower_right_75 / frame_per_sec > 0:
-    speed_lower_right_75 = dist_lower_right_75/conversion_pixel_to_cm/ (lower_right_75/ frame_per_sec )
-w_sheet.write(r_sheet.nrows+5,9,(speed_lower_right))
-w_sheet.write(r_sheet.nrows+5,10,(speed_lower_right_75))
-w_sheet.write(r_sheet.nrows+5,11,(speed_lower_right_50))
-w_sheet.write(r_sheet.nrows+5,12,(speed_lower_right_25))
-# BOUTS
-w_sheet.write(r_sheet.nrows+5,13,(lower_right_num_bout))
-w_sheet.write(r_sheet.nrows+5,14,(lower_right_frame_bout / frame_per_sec))
-w_sheet.write(r_sheet.nrows+5,15,(lower_right_distance_bout/conversion_pixel_to_cm))
-for i,f in enumerate(lower_right_lap_bout):
-    w_sheet.write(r_sheet.nrows+5,i+16,f)
+#w_sheet.write(r_sheet.nrows+4,0,"lower_left")
+## TIME
+#w_sheet.write(r_sheet.nrows+4,1,(lower_left    / frame_per_sec))
+#w_sheet.write(r_sheet.nrows+4,2,(lower_left_75 / frame_per_sec))
+#w_sheet.write(r_sheet.nrows+4,3,(lower_left_50 / frame_per_sec))
+#w_sheet.write(r_sheet.nrows+4,4,(lower_left_25 / frame_per_sec))
+## DISTANCE
+#w_sheet.write(r_sheet.nrows+4,5,(dist_lower_left /conversion_pixel_to_cm))
+#w_sheet.write(r_sheet.nrows+4,6,(dist_lower_left_75 / conversion_pixel_to_cm))
+#w_sheet.write(r_sheet.nrows+4,7,(dist_lower_left_50 / conversion_pixel_to_cm))
+#w_sheet.write(r_sheet.nrows+4,8,(dist_lower_left_25 / conversion_pixel_to_cm))
+## SPEED
+#speed_lower_left = speed_lower_left_25 = speed_lower_left_50 = speed_lower_left_75 = 0
+#if lower_left / frame_per_sec > 0:
+#    speed_lower_left = dist_lower_left/conversion_pixel_to_cm / ( lower_left /frame_per_sec)
+#if lower_left_25 / frame_per_sec > 0:
+#    speed_lower_left_25 = dist_lower_left_25/conversion_pixel_to_cm/ (lower_left_25/frame_per_sec)
+#if lower_left_50 / frame_per_sec > 0:
+#    speed_lower_left_50 = dist_lower_left_50/conversion_pixel_to_cm/ (lower_left_50/frame_per_sec )
+#if lower_left_75 / frame_per_sec > 0:
+#    speed_lower_left_75 = dist_lower_left_75/conversion_pixel_to_cm/ (lower_left_75/ frame_per_sec )
+#w_sheet.write(r_sheet.nrows+4,9,(speed_lower_left))
+#w_sheet.write(r_sheet.nrows+4,10,(speed_lower_left_75))
+#w_sheet.write(r_sheet.nrows+4,11,(speed_lower_left_50))
+#w_sheet.write(r_sheet.nrows+4,12,(speed_lower_left_25))
+## BOUTS
+#w_sheet.write(r_sheet.nrows+4,13,(lower_left_num_bout))
+#w_sheet.write(r_sheet.nrows+4,14,(lower_left_frame_bout / frame_per_sec))
+#w_sheet.write(r_sheet.nrows+4,15,(lower_left_distance_bout/conversion_pixel_to_cm))
+#for i,f in enumerate(lower_left_lap_bout):
+#    w_sheet.write(r_sheet.nrows+4,i+16,f)
+#
+#### UPPER LEFT
+#w_sheet.write(r_sheet.nrows+5,0,"lower_right")
+## TIME
+#w_sheet.write(r_sheet.nrows+5,1,(lower_right    / frame_per_sec))
+#w_sheet.write(r_sheet.nrows+5,2,(lower_right_75 / frame_per_sec))
+#w_sheet.write(r_sheet.nrows+5,3,(lower_right_50 / frame_per_sec))
+#w_sheet.write(r_sheet.nrows+5,4,(lower_right_25 / frame_per_sec))
+## DISTANCE
+#w_sheet.write(r_sheet.nrows+5,5,(dist_lower_right /conversion_pixel_to_cm))
+#w_sheet.write(r_sheet.nrows+5,6,(dist_lower_right_75 / conversion_pixel_to_cm))
+#w_sheet.write(r_sheet.nrows+5,7,(dist_lower_right_50 / conversion_pixel_to_cm))
+#w_sheet.write(r_sheet.nrows+5,8,(dist_lower_right_25 / conversion_pixel_to_cm))
+## SPEED
+#speed_lower_right = speed_lower_right_25 = speed_lower_right_50 = speed_lower_right_75 = 0
+#if lower_right / frame_per_sec > 0:
+#    speed_lower_right = dist_lower_right/conversion_pixel_to_cm / ( lower_right /frame_per_sec)
+#if lower_right_25 / frame_per_sec > 0:
+#    speed_lower_right_25 = dist_lower_right_25/conversion_pixel_to_cm/ (lower_right_25/frame_per_sec)
+#if lower_right_50 / frame_per_sec > 0:
+#    speed_lower_right_50 = dist_lower_right_50/conversion_pixel_to_cm/ (lower_right_50/frame_per_sec )
+#if lower_right_75 / frame_per_sec > 0:
+#    speed_lower_right_75 = dist_lower_right_75/conversion_pixel_to_cm/ (lower_right_75/ frame_per_sec )
+#w_sheet.write(r_sheet.nrows+5,9,(speed_lower_right))
+#w_sheet.write(r_sheet.nrows+5,10,(speed_lower_right_75))
+#w_sheet.write(r_sheet.nrows+5,11,(speed_lower_right_50))
+#w_sheet.write(r_sheet.nrows+5,12,(speed_lower_right_25))
+## BOUTS
+#w_sheet.write(r_sheet.nrows+5,13,(lower_right_num_bout))
+#w_sheet.write(r_sheet.nrows+5,14,(lower_right_frame_bout / frame_per_sec))
+#w_sheet.write(r_sheet.nrows+5,15,(lower_right_distance_bout/conversion_pixel_to_cm))
+#for i,f in enumerate(lower_right_lap_bout):
+#    w_sheet.write(r_sheet.nrows+5,i+16,f)
 
 #print "time_s_upper_right:\t" + str(upper_right/ frame_per_sec)
 #print "time_s_upper_right_25:\t" + str(upper_right_25 / frame_per_sec)
