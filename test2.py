@@ -138,12 +138,21 @@ width = 2*int(np.median(all_x))
 height = 2*int(np.median(all_y))
 
 cv_rect_obj1 = cv_rect_obj[0:height,0:width/2]
-w = width*0.75
-x = (width-width*0.75)/2
-h = height*0.75
-y = (height-height*0.75)/2
-cv2.rectangle(cv_rect_obj1,(x,y),(x+w,y+h),(0,255,0),2)
-
+w = int(width/2*0.70)
+x = int((width/2-width/2*0.70)/2)
+h = int(height*0.70)
+y = int((height-height*0.70)/2)
+cv2.rectangle(cv_rect_obj1,(x,y),(x+w,y+h),(0,255,0),1)
+w = int(width/2*0.45)
+x = int((width/2-width/2*0.45)/2)
+h = int(height*0.45)
+y = int((height-height*0.45)/2)
+cv2.rectangle(cv_rect_obj1,(x,y),(x+w,y+h),(0,255,0),1)
+w = int(width/2*0.20)
+x = int((width/2-width/2*0.20)/2)
+h = int(height*0.20)
+y = int((height-height*0.20)/2)
+cv2.rectangle(cv_rect_obj1,(x,y),(x+w,y+h),(0,255,0),1)
 cv2.imwrite("gray_test3.png",cv_rect_obj1)
 cv_rect_obj2 = cv_rect_obj[0:height,width/2:width]
 cv2.imwrite("gray_test2.png",cv_rect_obj2)
