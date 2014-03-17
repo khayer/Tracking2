@@ -138,6 +138,11 @@ width = 2*int(np.median(all_x))
 height = 2*int(np.median(all_y))
 
 cv_rect_obj1 = cv_rect_obj[0:height,0:width/2]
+w = width*0.75
+x = (width-width*0.75)/2
+h = height*0.75
+y = (height-height*0.75)/2
+cv2.rectangle(cv_rect_obj1,(x,y),(x+w,y+h),(0,255,0),2)
 
 cv2.imwrite("gray_test3.png",cv_rect_obj1)
 cv_rect_obj2 = cv_rect_obj[0:height,width/2:width]
@@ -164,110 +169,6 @@ perc_25_height = int((height-height*0.15)/2)
 bout_threshold = 11
 dist_threshold = 3
 conversion_pixel_to_cm = 10
-print diff_width
-print diff_height
-if diff_width <= 0:
-    correction_width_inner = int(-diff_width*20)
-    correction_width_outer = int(-diff_width*20)
-elif diff_width < 10:
-    correction_width_inner = int(diff_width*10)
-    correction_width_outer = int(diff_width*10)
-elif diff_width >= 10:
-    correction_width_inner = int(diff_width)
-    correction_width_outer = int(diff_width)
-else:
-    correction_width_inner = int(diff_width*1.5)
-    correction_width_outer = int(diff_width*1.7)
-if diff_height < 10:
-    correction_height_inner = -diff_height
-    correction_height_outer = -diff_height
-elif diff_height < 0:
-    correction_height_inner = -diff_height*2
-    correction_height_outer = -diff_height*2
-elif diff_height > 10 and diff_height <= 30:
-    correction_height_inner = -diff_height/2
-    correction_height_outer = -diff_height/2
-elif diff_height > 30:
-    correction_height_inner = diff_height/10
-    correction_height_outer = -diff_height/5
-else:
-    correction_height_inner = diff_height
-    correction_height_outer = diff_height
-
-last_upper_left = None
-upper_left_i = None
-upper_left_num_bout = 0
-upper_left_frame_bout = 0
-upper_left_distance_bout = 0
-upper_left_lap_bout = []
-upper_left = upper_left_75 = upper_left_50 = upper_left_25 = 0
-dist_upper_left = dist_upper_left_75 = dist_upper_left_50 = dist_upper_left_25 = 0
-upper_left_point1 = tuple([0,0])
-upper_left_point2 = tuple([half_width,height])
-upper_left_last_known_point = upper_left_point1
-upper_left_75_point1 = tuple([perc_75_width+ correction_width_outer,perc_75_height+correction_height_outer])
-upper_left_75_point2 = tuple([half_width-perc_75_width+ correction_width_inner,half_height-perc_75_height+correction_height_inner])
-upper_left_50_point1 = tuple([perc_50_width+ correction_width_outer,perc_50_height+correction_height_outer])
-upper_left_50_point2 = tuple([half_width-perc_50_width+ correction_width_inner,half_height-perc_50_height+correction_height_inner])
-upper_left_25_point1 = tuple([perc_25_width+ correction_width_outer,perc_25_height+correction_height_outer])
-upper_left_25_point2 = tuple([half_width-perc_25_width+ correction_width_inner,half_height-perc_25_height+correction_height_inner])
-
-last_upper_right = None
-upper_right_i = None
-upper_right_num_bout = 0
-upper_right_frame_bout = 0
-upper_right_distance_bout = 0
-upper_right_lap_bout = []
-upper_right = upper_right_75 = upper_right_50 = upper_right_25 = 0
-dist_upper_right = dist_upper_right_75 = dist_upper_right_50 = dist_upper_right_25 = 0
-upper_right_point1 = tuple([half_width,0])
-upper_right_point2 = tuple([width,height])
-upper_right_last_known_point = upper_right_point1
-upper_right_75_point1 = tuple([half_width+perc_75_width- correction_width_inner,perc_75_height+correction_height_outer])
-upper_right_75_point2 = tuple([width-perc_75_width- correction_width_outer,half_height-perc_75_height+correction_height_inner])
-upper_right_50_point1 = tuple([half_width+perc_50_width- correction_width_inner,perc_50_height+correction_height_outer])
-upper_right_50_point2 = tuple([width-perc_50_width- correction_width_outer,half_height-perc_50_height+correction_height_inner])
-upper_right_25_point1 = tuple([half_width+perc_25_width- correction_width_inner,perc_25_height+correction_height_outer])
-upper_right_25_point2 = tuple([width-perc_25_width- correction_width_outer,half_height-perc_25_height+correction_height_inner])
-
-#last_lower_left = None
-#lower_left_i = None
-#lower_left_num_bout = 0
-#lower_left_frame_bout = 0
-#lower_left_distance_bout = 0
-#lower_left_lap_bout = []
-#lower_left = lower_left_75 = lower_left_50 = lower_left_25 = 0
-#dist_lower_left = dist_lower_left_75 = dist_lower_left_50 = dist_lower_left_25 = 0
-#lower_left_point1 = tuple([0,half_height])
-#lower_left_point2 = tuple([half_width,height])
-#lower_left_last_known_point = lower_left_point1
-#lower_left_75_point1 = tuple([perc_75_width+ correction_width_outer,half_height+perc_75_height-correction_height_inner])
-#lower_left_75_point2 = tuple([half_width-perc_75_width+ correction_width_inner,height-perc_75_height-correction_height_outer])
-#lower_left_50_point1 = tuple([perc_50_width+ correction_width_outer,half_height+perc_50_height-correction_height_inner])
-#lower_left_50_point2 = tuple([half_width-perc_50_width+ correction_width_inner,height-perc_50_height-correction_height_outer])
-#lower_left_25_point1 = tuple([perc_25_width+ correction_width_outer,half_height+perc_25_height-correction_height_inner])
-#lower_left_25_point2 = tuple([half_width-perc_25_width+ correction_width_inner,height-perc_25_height-correction_height_outer])
-
-
-#last_lower_right = None
-#lower_right_i = None
-#lower_right_num_bout = 0
-#lower_right_frame_bout = 0
-#lower_right_distance_bout = 0
-#lower_right_lap_bout = []
-#lower_right = lower_right_75 = lower_right_50 = lower_right_25 = 0
-#dist_lower_right = dist_lower_right_75 = dist_lower_right_50 = dist_lower_right_25 = 0
-#lower_right_point1 = tuple([half_width,half_height])
-#lower_right_point2 = tuple([width,height])
-#lower_right_last_known_point = lower_right_point1
-#lower_right_75_point1 = tuple([half_width+perc_75_width- correction_width_inner,half_height+perc_75_height-correction_height_inner])
-#lower_right_75_point2 = tuple([width-perc_75_width- correction_width_outer ,height-perc_75_height-correction_height_outer])
-#lower_right_50_point1 = tuple([half_width+perc_50_width-correction_width_inner,half_height+perc_50_height-correction_height_inner])
-#lower_right_50_point2 = tuple([width-perc_50_width-correction_width_outer,height-perc_50_height-correction_height_outer])
-#lower_right_25_point1 = tuple([half_width+perc_25_width-correction_width_inner,half_height+perc_25_height-correction_height_inner])
-#lower_right_25_point2 = tuple([width-perc_25_width-correction_width_outer,height-perc_25_height-correction_height_outer])
-
-
 
 
 ## Points for heatmap
