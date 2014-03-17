@@ -52,9 +52,9 @@ print "Frame per sec"
 print frame_per_sec
 
 _,frame2 = cap.read()
-#frame2 = cv2.blur(frame2,(17,17))
+frame2 = cv2.blur(frame2,(15,15))
 imgray = cv2.cvtColor(frame2,cv2.COLOR_BGR2GRAY)
-ret,thresh = cv2.threshold(imgray,200,255,0)
+ret,thresh = cv2.threshold(imgray,170,200,0)
 cv2.imwrite("gray_tra.png",thresh)
 cv2.imshow('thresh',thresh)
 contours,hierarchy = cv2.findContours(thresh,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
@@ -67,7 +67,7 @@ while not contours:
     #frame2 = cv2.blur(frame2,(17,17))
     imgray = cv2.cvtColor(frame2,cv2.COLOR_BGR2GRAY)
     #cv2.imshow('imgray',imgray)
-    ret,thresh = cv2.threshold(imgray,200,255,0)
+    ret,thresh = cv2.threshold(imgray,170,200,0)
     #cv2.imwrite("gray_tra.png",thresh)
     #cv2.imshow('thresh',thresh)
     contours,hierarchy = cv2.findContours(thresh,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
@@ -95,9 +95,52 @@ height = 2*int(np.median(all_y))
 diff_width = actual_width - width
 diff_height = actual_height - height
 
-cv_rect_obj = imgray[0:height,0:width/2]
+cv_rect_obj = frame2[0:height,0:width]
 cv2.imwrite("gray_test.png",cv_rect_obj)
-cv_rect_obj2 = imgray[0:height,width/2:width]
+#hsv = cv2.cvtColor(cv_rect_obj,cv2.COLOR_BGR2HSV)
+thresh = cv2.inRange(cv_rect_obj,np.array((90, 90, 90)), np.array((160, 160, 160)))
+cv2.imwrite("gray_test3.png",thresh)
+element = cv2.getStructuringElement(cv2.MORPH_ELLIPSE ,(3,3))
+cv2.erode(thresh,element,thresh,None,2)
+cv2.dilate(thresh,element,thresh,None,10)
+contours,hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+#cv2.drawContours(cv_rect_obj,contours,-1,cv.CV_RGB(255,255,0),1)
+
+areas = [cv2.contourArea(c) for c in contours]
+max_index = np.argmax(areas)
+cnt=contours[max_index]
+
+x,y,w,h = cv2.boundingRect(cnt)
+#cv2.rectangle(cv_rect_obj,(x,y),(x+w,y+h),(0,255,0),2)
+cv_rect_obj = cv_rect_obj[y:y+h,x:w+x]
+#cv2.imshow('thresh_first',thresh)
+#element = cv2.getStructuringElement(cv2.MORPH_ELLIPSE ,(3,3))
+
+imgray = cv2.cvtColor(cv_rect_obj,cv2.COLOR_BGR2GRAY)
+ret,thresh = cv2.threshold(imgray,170,200,0)
+cv2.imwrite("gray_tra2.png",thresh)
+cv2.imshow('thresh',thresh)
+contours,hierarchy = cv2.findContours(thresh,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
+num_p = 0
+all_x = []
+all_y = []
+
+for cnt in contours:
+    for point in cnt:
+        num_p = num_p + 1
+        x = point[0][0]
+        y = point[0][1]
+        if x > 20 and x < 640 and y > 20 and y < 460:
+            all_x.append(x)
+            all_y.append(y)
+
+width = 2*int(np.median(all_x))
+height = 2*int(np.median(all_y))
+
+cv_rect_obj1 = cv_rect_obj[0:height,0:width/2]
+
+cv2.imwrite("gray_test3.png",cv_rect_obj1)
+cv_rect_obj2 = cv_rect_obj[0:height,width/2:width]
 cv2.imwrite("gray_test2.png",cv_rect_obj2)
 
 def comp_tuple(mp,pt1,pt2):
