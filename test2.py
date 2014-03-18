@@ -85,7 +85,6 @@ print (all_y)
 print np.median(all_x)
 print np.median(all_y)
 
-
 actual_width = int(cap.get(3))
 actual_height = int(cap.get(4))
 
@@ -137,22 +136,18 @@ for cnt in contours:
 width = 2*int(np.median(all_x))
 height = 2*int(np.median(all_y))
 
+def draw_rect(pic,height,width,percentage):
+    w = int(width*percentage)
+    x = int((width-width*percentage)/2)
+    h = int(height*percentage)
+    y = int((height-height*percentage)/2)
+    cv2.rectangle(pic,(x,y),(x+w,y+h),(0,255,0),1)
+    return
+
 cv_rect_obj1 = cv_rect_obj[0:height,0:width/2]
-w = int(width/2*0.70)
-x = int((width/2-width/2*0.70)/2)
-h = int(height*0.70)
-y = int((height-height*0.70)/2)
-cv2.rectangle(cv_rect_obj1,(x,y),(x+w,y+h),(0,255,0),1)
-w = int(width/2*0.45)
-x = int((width/2-width/2*0.45)/2)
-h = int(height*0.45)
-y = int((height-height*0.45)/2)
-cv2.rectangle(cv_rect_obj1,(x,y),(x+w,y+h),(0,255,0),1)
-w = int(width/2*0.20)
-x = int((width/2-width/2*0.20)/2)
-h = int(height*0.20)
-y = int((height-height*0.20)/2)
-cv2.rectangle(cv_rect_obj1,(x,y),(x+w,y+h),(0,255,0),1)
+draw_rect(cv_rect_obj1,height,width/2,0.7)
+draw_rect(cv_rect_obj1,height,width/2,0.45)
+draw_rect(cv_rect_obj1,height,width/2,0.2)
 cv2.imwrite("gray_test3.png",cv_rect_obj1)
 cv_rect_obj2 = cv_rect_obj[0:height,width/2:width]
 cv2.imwrite("gray_test2.png",cv_rect_obj2)
@@ -179,18 +174,11 @@ bout_threshold = 11
 dist_threshold = 3
 conversion_pixel_to_cm = 10
 
-
 ## Points for heatmap
 x = []
 y = []
 mid_points = []
 
-# convert to hsv and find range of colors
-#hsv = cv2.cvtColor(frame_cross,cv2.COLOR_BGR2HSV)
-#thresh = cv2.inRange(hsv,np.array((250, 250, 250)), np.array((255,255,255)))
-#cv2.imshow('blur',frame_cross)
-print half_width
-print half_height
 frame_number = cap.get(CV_CAP_PROP_POS_FRAMES)
 time_in_msec = 0
 #frame_per_sec = 0
