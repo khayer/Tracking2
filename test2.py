@@ -51,158 +51,8 @@ frame_per_sec = 30.03888889
 print "Frame per sec"
 print frame_per_sec
 
-_,frame2 = cap.read()
-frame2 = cv2.blur(frame2,(15,15))
-imgray = cv2.cvtColor(frame2,cv2.COLOR_BGR2GRAY)
-ret,thresh = cv2.threshold(imgray,170,200,0)
-cv2.imwrite("gray_tra.png",thresh)
-cv2.imshow('thresh',thresh)
-contours,hierarchy = cv2.findContours(thresh,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
-num_p = 0
-all_x = []
-all_y = []
-while not contours:
-    _,frame2 = cap.read()
-    cv2.imshow('frame2',frame2)
-    #frame2 = cv2.blur(frame2,(17,17))
-    imgray = cv2.cvtColor(frame2,cv2.COLOR_BGR2GRAY)
-    #cv2.imshow('imgray',imgray)
-    ret,thresh = cv2.threshold(imgray,170,200,0)
-    #cv2.imwrite("gray_tra.png",thresh)
-    #cv2.imshow('thresh',thresh)
-    contours,hierarchy = cv2.findContours(thresh,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
 
-for cnt in contours:
-    for point in cnt:
-        num_p = num_p + 1
-        x = point[0][0]
-        y = point[0][1]
-        if x > 20 and x < 640 and y > 20 and y < 460:
-            all_x.append(x)
-            all_y.append(y)
-print (all_x)
-print (all_y)
-print np.median(all_x)
-print np.median(all_y)
-
-actual_width = int(cap.get(3))
-actual_height = int(cap.get(4))
-
-width = 2*int(np.median(all_x))
-height = 2*int(np.median(all_y))
-
-diff_width = actual_width - width
-diff_height = actual_height - height
-
-cv_rect_obj = frame2[0:height,0:width]
-cv2.imwrite("gray_test.png",cv_rect_obj)
-#hsv = cv2.cvtColor(cv_rect_obj,cv2.COLOR_BGR2HSV)
-thresh = cv2.inRange(cv_rect_obj,np.array((90, 90, 90)), np.array((160, 160, 160)))
-cv2.imwrite("gray_test3.png",thresh)
-element = cv2.getStructuringElement(cv2.MORPH_ELLIPSE ,(3,3))
-cv2.erode(thresh,element,thresh,None,2)
-cv2.dilate(thresh,element,thresh,None,10)
-contours,hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
-#cv2.drawContours(cv_rect_obj,contours,-1,cv.CV_RGB(255,255,0),1)
-
-areas = [cv2.contourArea(c) for c in contours]
-max_index = np.argmax(areas)
-cnt=contours[max_index]
-
-x,y,w,h = cv2.boundingRect(cnt)
-#cv2.rectangle(cv_rect_obj,(x,y),(x+w,y+h),(0,255,0),2)
-cv_rect_obj = cv_rect_obj[y:y+h,x:w+x]
-#cv2.imshow('thresh_first',thresh)
-#element = cv2.getStructuringElement(cv2.MORPH_ELLIPSE ,(3,3))
-
-imgray = cv2.cvtColor(cv_rect_obj,cv2.COLOR_BGR2GRAY)
-ret,thresh = cv2.threshold(imgray,170,200,0)
-cv2.imwrite("gray_tra2.png",thresh)
-cv2.imshow('thresh',thresh)
-contours,hierarchy = cv2.findContours(thresh,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
-num_p = 0
-all_x = []
-all_y = []
-
-for cnt in contours:
-    for point in cnt:
-        num_p = num_p + 1
-        x = point[0][0]
-        y = point[0][1]
-        if x > 20 and x < 640 and y > 20 and y < 460:
-            all_x.append(x)
-            all_y.append(y)
-
-width = 2*int(np.median(all_x))
-height = 2*int(np.median(all_y))
-
-def draw_rect(pic,height,width,percentage):
-    w = int(width*percentage)
-    x = int((width-width*percentage)/2)
-    h = int(height*percentage)
-    y = int((height-height*percentage)/2)
-    cv2.rectangle(pic,(x,y),(x+w,y+h),(0,255,0),1)
-    return
-
-cv_rect_obj1 = cv_rect_obj[0:height,0:width/2]
-draw_rect(cv_rect_obj1,height,width/2,0.7)
-draw_rect(cv_rect_obj1,height,width/2,0.45)
-draw_rect(cv_rect_obj1,height,width/2,0.2)
-cv2.imwrite("gray_test3.png",cv_rect_obj1)
-cv_rect_obj2 = cv_rect_obj[0:height,width/2:width]
-cv2.imwrite("gray_test2.png",cv_rect_obj2)
-
-def comp_tuple(mp,pt1,pt2):
-    return mp[0] >= pt1[0] and mp[0] <= pt2[0] and mp[1] >= pt1[1] and mp[1] <= pt2[1]
-
-def dist(pt1,pt2):
-    xd = pt2[0] - pt1[0]
-    yd = pt2[1] - pt1[1]
-    return math.sqrt(xd*xd + yd*yd)
-
-half_width = int(width/2)
-half_height = int(height/2)
-
-perc_75_width = int((half_width-half_width*0.55)/2)
-perc_75_height = int((height-height*0.55)/2)
-perc_50_width = int((half_width-half_width*0.35)/2)
-perc_50_height = int((height-height*0.35)/2)
-perc_25_width = int((half_width-half_width*0.15)/2)
-perc_25_height = int((height-height*0.15)/2)
-
-bout_threshold = 11
-dist_threshold = 3
-conversion_pixel_to_cm = 10
-
-## Points for heatmap
-x = []
-y = []
-mid_points = []
-
-frame_number = cap.get(CV_CAP_PROP_POS_FRAMES)
-time_in_msec = 0
-#frame_per_sec = 0
-while(frame_number < total_number_of_frames):
-#while(frame_number < 250):
-    frame_number = cap.get(CV_CAP_PROP_POS_FRAMES)
-    #CV_CAP_PROP_POS_MSEC
-    #l = cap.get(CV_CAP_PROP_POS_MSEC)
-    #if l <= 1000:
-    #    print l
-    #    frame_per_sec += 1.0
-    # read the frames
-    frame_number = int(frame_number+100)
-    cap.set(CV_CAP_PROP_POS_FRAMES,frame_number)
-    _,frame = cap.read()
-    if cap.get(CV_CAP_PROP_POS_MSEC) > 0.0:
-        time_in_msec = cap.get(CV_CAP_PROP_POS_MSEC)
-    percent = frame_number/total_number_of_frames * 100
-    l = int(percent/2)
-    if l%2==0:
-      sys.stderr.write("\r[%-50s] %d%%" % ('='*int(l), percent))
-      sys.stderr.flush()
-    #capture = cv.CaptureFromFile("/Users/hayer/Desktop/Anand/openfields/071211_Batch1-openfield.m4v")
-
+def analyze(frame):
     # smooth it
     #cv2.imshow('before',frame)
     frame3 = cv2.blur(frame,(17,17))
@@ -227,6 +77,12 @@ while(frame_number < total_number_of_frames):
 
     # finding contour with maximum area and store it as best_cnt
 
+
+    draw_rect(frame,height,width/2,0.7)
+    draw_rect(frame,height,width/2,0.45)
+    draw_rect(frame,height,width/2,0.2)
+    cv2.imshow("gray_test3.png",frame)
+
     max_area = 0
     contours2 = contours
     #i = 0
@@ -250,18 +106,12 @@ while(frame_number < total_number_of_frames):
     cv2.line(frame,start,end,cv.CV_RGB(255,0,255))
     cv2.line(frame,start,end,cv.CV_RGB(255,0,255))
 
-    cv2.rectangle(frame,upper_left_75_point1,upper_left_75_point2,cv.CV_RGB(255,0,255))
-    cv2.rectangle(frame,upper_left_50_point1,upper_left_50_point2,cv.CV_RGB(255,0,255))
-    cv2.rectangle(frame,upper_left_25_point1,upper_left_25_point2,cv.CV_RGB(255,0,255))
-    cv2.rectangle(frame,upper_right_75_point1,upper_right_75_point2,cv.CV_RGB(255,0,0))
-    cv2.rectangle(frame,upper_right_50_point1,upper_right_50_point2,cv.CV_RGB(255,0,0))
-    cv2.rectangle(frame,upper_right_25_point1,upper_right_25_point2,cv.CV_RGB(255,0,0))
-    #cv2.rectangle(frame,lower_left_75_point1,lower_left_75_point2,cv.CV_RGB(0,0,255))
-    #cv2.rectangle(frame,lower_left_50_point1,lower_left_50_point2,cv.CV_RGB(0,0,255))
-    #cv2.rectangle(frame,lower_left_25_point1,lower_left_25_point2,cv.CV_RGB(0,0,255))
-    #cv2.rectangle(frame,lower_right_75_point1,lower_right_75_point2,cv.CV_RGB(0,255,0))
-    #cv2.rectangle(frame,lower_right_50_point1,lower_right_50_point2,cv.CV_RGB(0,255,0))
-    #cv2.rectangle(frame,lower_right_25_point1,lower_right_25_point2,cv.CV_RGB(0,255,0))
+    #cv2.rectangle(frame,upper_left_75_point1,upper_left_75_point2,cv.CV_RGB(255,0,255))
+    #cv2.rectangle(frame,upper_left_50_point1,upper_left_50_point2,cv.CV_RGB(255,0,255))
+    #cv2.rectangle(frame,upper_left_25_point1,upper_left_25_point2,cv.CV_RGB(255,0,255))
+    #cv2.rectangle(frame,upper_right_75_point1,upper_right_75_point2,cv.CV_RGB(255,0,0))
+    #cv2.rectangle(frame,upper_right_50_point1,upper_right_50_point2,cv.CV_RGB(255,0,0))
+    #cv2.rectangle(frame,upper_right_25_point1,upper_right_25_point2,cv.CV_RGB(255,0,0))
 
     mid_points = []
     for cnt in contours2:
@@ -352,90 +202,6 @@ while(frame_number < total_number_of_frames):
             last_upper_right = mp
             upper_right_last_known_point = mp
 
-     # if comp_tuple(mp,lower_left_point1,lower_left_point2) and left_lower_bool ==1:
-     #     left_lower_bool = 0
-     #     last_lower_left = last_lower_left or mp
-     #     distance = dist(last_lower_left,mp)
-     #     if distance > dist_threshold:
-     #         lower_left_i = 0 or lower_left_i
-     #         lower_left_i = lower_left_i + 1
-     #         if lower_left_i == bout_threshold:
-     #             lower_left_num_bout = lower_left_num_bout + 1
-     #             lower_left_lap_bout.append(0)
-     #         if lower_left_i >= bout_threshold:
-     #             cv2.circle(frame,mp, 5, cv.CV_RGB(0,255,0))
-     #             lower_left_frame_bout = lower_left_frame_bout + 1
-     #             lower_left_distance_bout = lower_left_distance_bout + distance
-     #             lower_left_lap_bout[-1] = lower_left_lap_bout[-1] +1
-     #     else:
-     #         distance = 0
-     #         lower_left_i = 0
-     #     if comp_tuple(mp,lower_left_25_point1,lower_left_25_point2):
-     #         dist_lower_left_25 = dist_lower_left_25 + distance
-     #         lower_left_25 = lower_left_25 + 1
-     #     elif comp_tuple(mp,lower_left_50_point1,lower_left_50_point2):
-     #         dist_lower_left_50 = dist_lower_left_50 + distance
-     #         lower_left_50 = lower_left_50 + 1
-     #     elif comp_tuple(mp,lower_left_75_point1,lower_left_75_point2):
-     #         dist_lower_left_75 = dist_lower_left_75 + distance
-     #         lower_left_75 = lower_left_75 + 1
-     #     else:
-     #         lower_left = lower_left + 1
-     #         dist_lower_left = dist_lower_left + distance
-     #     last_lower_left = mp
-     #     lower_left_last_known_point = mp
-
-     # if comp_tuple(mp,lower_right_point1,lower_right_point2) and right_lower_bool:
-     #     right_lower_bool = 0
-     #     last_lower_right = last_lower_right or mp
-     #     distance = dist(last_lower_right,mp)
-     #     if distance > dist_threshold:
-     #         lower_right_i = 0 or lower_right_i
-     #         lower_right_i = lower_right_i + 1
-     #         if lower_right_i == bout_threshold:
-     #             lower_right_num_bout = lower_right_num_bout + 1
-     #             lower_right_lap_bout.append(0)
-     #         if lower_right_i >= bout_threshold:
-     #             cv2.circle(frame,mp, 5, cv.CV_RGB(255,255,0))
-     #             lower_right_frame_bout = lower_right_frame_bout + 1
-     #             lower_right_distance_bout = lower_right_distance_bout + distance
-     #             lower_right_lap_bout[-1] = lower_right_lap_bout[-1] +1
-     #     else:
-     #         distance = 0
-     #         lower_right_i = 0
-     #     if comp_tuple(mp,lower_right_25_point1,lower_right_25_point2):
-     #         dist_lower_right_25 = dist_lower_right_25 + distance
-     #         lower_right_25 = lower_right_25 + 1
-     #     elif comp_tuple(mp,lower_right_50_point1,lower_right_50_point2):
-     #         dist_lower_right_50 = dist_lower_right_50 + distance
-     #         lower_right_50 = lower_right_50 + 1
-     #     elif comp_tuple(mp,lower_right_75_point1,lower_right_75_point2):
-     #         dist_lower_right_75 = dist_lower_right_75 + distance
-     #         lower_right_75 = lower_right_75 + 1
-     #     else:
-     #         lower_right = lower_right + 1
-     #         dist_lower_right = dist_lower_right + distance
-     #     last_lower_right = mp
-   # if left_lower_bool == 1:
-   #     mp = lower_left_last_known_point
-   #     if comp_tuple(mp,lower_left_25_point1,lower_left_25_point2):
-   #         lower_left_25 = lower_left_25 + 1
-   #     elif comp_tuple(mp,lower_right_50_point1,lower_right_50_point2):
-   #         lower_left_50 = lower_left_50 + 1
-   #     elif comp_tuple(mp,lower_right_75_point1,lower_right_75_point2):
-   #         lower_left_75 = lower_left_75 + 1
-   #     else:
-   #         lower_left = lower_left + 1
-   # if right_lower_bool == 1:
-   #     mp = lower_right_last_known_point
-   #     if comp_tuple(mp,lower_right_25_point1,lower_right_25_point2):
-   #         lower_right_25 = lower_right_25 + 1
-   #     elif comp_tuple(mp,lower_right_50_point1,lower_right_50_point2):
-   #         lower_right_50 = lower_right_50 + 1
-   #     elif comp_tuple(mp,lower_right_75_point1,lower_right_75_point2):
-   #         lower_right_75 = lower_right_75 + 1
-   #     else:
-   #         lower_right = lower_right + 1
     if left_upper_bool == 1:
         mp = upper_left_last_known_point
         if comp_tuple(mp,upper_left_25_point1,upper_left_25_point2):
@@ -467,8 +233,173 @@ while(frame_number < total_number_of_frames):
     cv2.imshow('thresh',thresh2)
     cv2.imshow('contour',frame2)
     cv2.imshow('frame',frame)
-    if cv2.waitKey(33)== 27:
+    
+
+_,frame2 = cap.read()
+frame2 = cv2.blur(frame2,(15,15))
+imgray = cv2.cvtColor(frame2,cv2.COLOR_BGR2GRAY)
+ret,thresh = cv2.threshold(imgray,170,200,0)
+cv2.imwrite("gray_tra.png",thresh)
+cv2.imshow('thresh',thresh)
+contours,hierarchy = cv2.findContours(thresh,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
+num_p = 0
+all_x = []
+all_y = []
+while not contours:
+    _,frame2 = cap.read()
+    cv2.imshow('frame2',frame2)
+    #frame2 = cv2.blur(frame2,(17,17))
+    imgray = cv2.cvtColor(frame2,cv2.COLOR_BGR2GRAY)
+    #cv2.imshow('imgray',imgray)
+    ret,thresh = cv2.threshold(imgray,170,200,0)
+    #cv2.imwrite("gray_tra.png",thresh)
+    #cv2.imshow('thresh',thresh)
+    contours,hierarchy = cv2.findContours(thresh,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
+
+for cnt in contours:
+    for point in cnt:
+        num_p = num_p + 1
+        x = point[0][0]
+        y = point[0][1]
+        if x > 20 and x < 640 and y > 20 and y < 460:
+            all_x.append(x)
+            all_y.append(y)
+print (all_x)
+print (all_y)
+print np.median(all_x)
+print np.median(all_y)
+
+actual_width = int(cap.get(3))
+actual_height = int(cap.get(4))
+
+width = 2*int(np.median(all_x))
+height = 2*int(np.median(all_y))
+
+diff_width = actual_width - width
+diff_height = actual_height - height
+
+cv_rect_obj = frame2[0:height,0:width]
+cv2.imwrite("gray_test.png",cv_rect_obj)
+#hsv = cv2.cvtColor(cv_rect_obj,cv2.COLOR_BGR2HSV)
+thresh = cv2.inRange(cv_rect_obj,np.array((90, 90, 90)), np.array((160, 160, 160)))
+cv2.imwrite("gray_test3.png",thresh)
+element = cv2.getStructuringElement(cv2.MORPH_ELLIPSE ,(3,3))
+cv2.erode(thresh,element,thresh,None,2)
+cv2.dilate(thresh,element,thresh,None,10)
+contours,hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+#cv2.drawContours(cv_rect_obj,contours,-1,cv.CV_RGB(255,255,0),1)
+
+areas = [cv2.contourArea(c) for c in contours]
+max_index = np.argmax(areas)
+cnt=contours[max_index]
+
+x_in,y_in,w_in,h_in = cv2.boundingRect(cnt)
+#cv2.rectangle(cv_rect_obj,(x,y),(x+w,y+h),(0,255,0),2)
+cv_rect_obj = cv_rect_obj[y_in:y_in+h_in,x_in:w_in+x_in]
+#cv2.imshow('thresh_first',thresh)
+#element = cv2.getStructuringElement(cv2.MORPH_ELLIPSE ,(3,3))
+
+imgray = cv2.cvtColor(cv_rect_obj,cv2.COLOR_BGR2GRAY)
+ret,thresh = cv2.threshold(imgray,170,200,0)
+cv2.imwrite("gray_tra2.png",thresh)
+cv2.imshow('thresh',thresh)
+contours,hierarchy = cv2.findContours(thresh,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
+num_p = 0
+all_x = []
+all_y = []
+
+for cnt in contours:
+    for point in cnt:
+        num_p = num_p + 1
+        x = point[0][0]
+        y = point[0][1]
+        if x > 20 and x < 640 and y > 20 and y < 460:
+            all_x.append(x)
+            all_y.append(y)
+
+width = 2*int(np.median(all_x))
+height = 2*int(np.median(all_y))
+
+def draw_rect(pic,height,width,percentage):
+    w = int(width*percentage)
+    x = int((width-width*percentage)/2)
+    h = int(height*percentage)
+    y = int((height-height*percentage)/2)
+    cv2.rectangle(pic,(x,y),(x+w,y+h),(0,255,0),1)
+    return
+
+cv_rect_obj1 = cv_rect_obj[0:height,0:width/2]
+draw_rect(cv_rect_obj1,height,width/2,0.7)
+draw_rect(cv_rect_obj1,height,width/2,0.45)
+draw_rect(cv_rect_obj1,height,width/2,0.2)
+cv2.imwrite("gray_test3.png",cv_rect_obj1)
+cv_rect_obj2 = cv_rect_obj[0:height,width/2:width]
+draw_rect(cv_rect_obj2,height,width/2,0.7)
+draw_rect(cv_rect_obj2,height,width/2,0.45)
+draw_rect(cv_rect_obj2,height,width/2,0.2)
+cv2.imwrite("gray_test2.png",cv_rect_obj2)
+
+def comp_tuple(mp,pt1,pt2):
+    return mp[0] >= pt1[0] and mp[0] <= pt2[0] and mp[1] >= pt1[1] and mp[1] <= pt2[1]
+
+def dist(pt1,pt2):
+    xd = pt2[0] - pt1[0]
+    yd = pt2[1] - pt1[1]
+    return math.sqrt(xd*xd + yd*yd)
+
+#half_width = int(width/2)
+#half_height = int(height/2)
+#
+#perc_75_width = int((half_width-half_width*0.55)/2)
+#perc_75_height = int((height-height*0.55)/2)
+#perc_50_width = int((half_width-half_width*0.35)/2)
+#perc_50_height = int((height-height*0.35)/2)
+#perc_25_width = int((half_width-half_width*0.15)/2)
+#perc_25_height = int((height-height*0.15)/2)
+
+bout_threshold = 11
+dist_threshold = 3
+conversion_pixel_to_cm = 10
+
+## Points for heatmap
+x = []
+y = []
+mid_points = []
+
+frame_number = cap.get(CV_CAP_PROP_POS_FRAMES)
+time_in_msec = 0
+#frame_per_sec = 0
+while(frame_number < total_number_of_frames):
+#while(frame_number < 250):
+    frame_number = cap.get(CV_CAP_PROP_POS_FRAMES)
+    #CV_CAP_PROP_POS_MSEC
+    #l = cap.get(CV_CAP_PROP_POS_MSEC)
+    #if l <= 1000:
+    #    print l
+    #    frame_per_sec += 1.0
+    # read the frames
+    frame_number = int(frame_number+100)
+    cap.set(CV_CAP_PROP_POS_FRAMES,frame_number)
+    _,frame = cap.read()
+    frame = frame[y_in:y_in+h_in,x_in:w_in+x_in]
+    if cap.get(CV_CAP_PROP_POS_MSEC) > 0.0:
+        time_in_msec = cap.get(CV_CAP_PROP_POS_MSEC)
+    percent = frame_number/total_number_of_frames * 100
+    l = int(percent/2)
+    if l%2==0:
+      sys.stderr.write("\r[%-50s] %d%%" % ('='*int(l), percent))
+      sys.stderr.flush()
+    #capture = cv.CaptureFromFile("/Users/hayer/Desktop/Anand/openfields/071211_Batch1-openfield.m4v")
+
+    cv_rect_obj1 = frame[0:height,0:width/2]
+    cv_rect_obj2 = frame[0:height,width/2:width]
+
+    analyze(cv_rect_obj1)
+    analyze(cv_rect_obj2)
+
+    if cv2.waitKey(33) == 27:
         break
+    
 
 cv2.imwrite(sample_name + "_tra.png",frame2)
 # Clean up everything before leaving
@@ -560,193 +491,6 @@ w_sheet.write(r_sheet.nrows+3,15,(upper_right_distance_bout/conversion_pixel_to_
 for i,f in enumerate(upper_right_lap_bout):
     w_sheet.write(r_sheet.nrows+3,i+16,f)
 
-### LOWER LEFT
-#w_sheet.write(r_sheet.nrows+4,0,"lower_left")
-## TIME
-#w_sheet.write(r_sheet.nrows+4,1,(lower_left    / frame_per_sec))
-#w_sheet.write(r_sheet.nrows+4,2,(lower_left_75 / frame_per_sec))
-#w_sheet.write(r_sheet.nrows+4,3,(lower_left_50 / frame_per_sec))
-#w_sheet.write(r_sheet.nrows+4,4,(lower_left_25 / frame_per_sec))
-## DISTANCE
-#w_sheet.write(r_sheet.nrows+4,5,(dist_lower_left /conversion_pixel_to_cm))
-#w_sheet.write(r_sheet.nrows+4,6,(dist_lower_left_75 / conversion_pixel_to_cm))
-#w_sheet.write(r_sheet.nrows+4,7,(dist_lower_left_50 / conversion_pixel_to_cm))
-#w_sheet.write(r_sheet.nrows+4,8,(dist_lower_left_25 / conversion_pixel_to_cm))
-## SPEED
-#speed_lower_left = speed_lower_left_25 = speed_lower_left_50 = speed_lower_left_75 = 0
-#if lower_left / frame_per_sec > 0:
-#    speed_lower_left = dist_lower_left/conversion_pixel_to_cm / ( lower_left /frame_per_sec)
-#if lower_left_25 / frame_per_sec > 0:
-#    speed_lower_left_25 = dist_lower_left_25/conversion_pixel_to_cm/ (lower_left_25/frame_per_sec)
-#if lower_left_50 / frame_per_sec > 0:
-#    speed_lower_left_50 = dist_lower_left_50/conversion_pixel_to_cm/ (lower_left_50/frame_per_sec )
-#if lower_left_75 / frame_per_sec > 0:
-#    speed_lower_left_75 = dist_lower_left_75/conversion_pixel_to_cm/ (lower_left_75/ frame_per_sec )
-#w_sheet.write(r_sheet.nrows+4,9,(speed_lower_left))
-#w_sheet.write(r_sheet.nrows+4,10,(speed_lower_left_75))
-#w_sheet.write(r_sheet.nrows+4,11,(speed_lower_left_50))
-#w_sheet.write(r_sheet.nrows+4,12,(speed_lower_left_25))
-## BOUTS
-#w_sheet.write(r_sheet.nrows+4,13,(lower_left_num_bout))
-#w_sheet.write(r_sheet.nrows+4,14,(lower_left_frame_bout / frame_per_sec))
-#w_sheet.write(r_sheet.nrows+4,15,(lower_left_distance_bout/conversion_pixel_to_cm))
-#for i,f in enumerate(lower_left_lap_bout):
-#    w_sheet.write(r_sheet.nrows+4,i+16,f)
-#
-#### UPPER LEFT
-#w_sheet.write(r_sheet.nrows+5,0,"lower_right")
-## TIME
-#w_sheet.write(r_sheet.nrows+5,1,(lower_right    / frame_per_sec))
-#w_sheet.write(r_sheet.nrows+5,2,(lower_right_75 / frame_per_sec))
-#w_sheet.write(r_sheet.nrows+5,3,(lower_right_50 / frame_per_sec))
-#w_sheet.write(r_sheet.nrows+5,4,(lower_right_25 / frame_per_sec))
-## DISTANCE
-#w_sheet.write(r_sheet.nrows+5,5,(dist_lower_right /conversion_pixel_to_cm))
-#w_sheet.write(r_sheet.nrows+5,6,(dist_lower_right_75 / conversion_pixel_to_cm))
-#w_sheet.write(r_sheet.nrows+5,7,(dist_lower_right_50 / conversion_pixel_to_cm))
-#w_sheet.write(r_sheet.nrows+5,8,(dist_lower_right_25 / conversion_pixel_to_cm))
-## SPEED
-#speed_lower_right = speed_lower_right_25 = speed_lower_right_50 = speed_lower_right_75 = 0
-#if lower_right / frame_per_sec > 0:
-#    speed_lower_right = dist_lower_right/conversion_pixel_to_cm / ( lower_right /frame_per_sec)
-#if lower_right_25 / frame_per_sec > 0:
-#    speed_lower_right_25 = dist_lower_right_25/conversion_pixel_to_cm/ (lower_right_25/frame_per_sec)
-#if lower_right_50 / frame_per_sec > 0:
-#    speed_lower_right_50 = dist_lower_right_50/conversion_pixel_to_cm/ (lower_right_50/frame_per_sec )
-#if lower_right_75 / frame_per_sec > 0:
-#    speed_lower_right_75 = dist_lower_right_75/conversion_pixel_to_cm/ (lower_right_75/ frame_per_sec )
-#w_sheet.write(r_sheet.nrows+5,9,(speed_lower_right))
-#w_sheet.write(r_sheet.nrows+5,10,(speed_lower_right_75))
-#w_sheet.write(r_sheet.nrows+5,11,(speed_lower_right_50))
-#w_sheet.write(r_sheet.nrows+5,12,(speed_lower_right_25))
-## BOUTS
-#w_sheet.write(r_sheet.nrows+5,13,(lower_right_num_bout))
-#w_sheet.write(r_sheet.nrows+5,14,(lower_right_frame_bout / frame_per_sec))
-#w_sheet.write(r_sheet.nrows+5,15,(lower_right_distance_bout/conversion_pixel_to_cm))
-#for i,f in enumerate(lower_right_lap_bout):
-#    w_sheet.write(r_sheet.nrows+5,i+16,f)
-
-#print "time_s_upper_right:\t" + str(upper_right/ frame_per_sec)
-#print "time_s_upper_right_25:\t" + str(upper_right_25 / frame_per_sec)
-#print "time_s_upper_right_50:\t" + str(upper_right_50/ frame_per_sec)
-#print "time_s_upper_right_75:\t" + str(upper_right_75/ frame_per_sec)
-#
-#print "dist_upper_right:\t" + str(dist_upper_right/conversion_pixel_to_cm)
-#print "dist_upper_right_25:\t" + str(dist_upper_right_25/conversion_pixel_to_cm)
-#print "dist_upper_right_50:\t" + str(dist_upper_right_50/conversion_pixel_to_cm)
-#print "dist_upper_right_75:\t" + str(dist_upper_right_75/conversion_pixel_to_cm)
-#
-
-#print "speed_upper_right:\t" + str(speed_upper_right)
-#print "speed_upper_right_25:\t" + str(speed_upper_right_25)
-#print "speed_upper_right_50:\t" + str(speed_upper_right_50)
-#print "speed_upper_right_75:\t" + str(speed_upper_right_75)
-#
-#print "upper_right_num_bout:\t" + str(upper_right_num_bout)
-#print "seconds in bout:\t" + str(upper_right_frame_bout / frame_per_sec)
-#
-#print "upper_right_distance_bout:\t" + str(upper_right_distance_bout/conversion_pixel_to_cm)
-#print "upper_right_lap_bout:"
-#print "\t".join(map(str,upper_right_lap_bout))
-
-
-#print "----------------------------"
-#print "time_s_upper_left:\t" + str(upper_left/ frame_per_sec)
-#print "time_s_upper_left_25:\t" + str(upper_left_25 / frame_per_sec)
-#print "time_s_upper_left_50:\t" + str(upper_left_50/ frame_per_sec)
-#print "time_s_upper_left_75:\t" + str(upper_left_75/ frame_per_sec)
-#
-#print "dist_upper_left:\t" + str(dist_upper_left/conversion_pixel_to_cm)
-#print "dist_upper_left_25:\t" + str(dist_upper_left_25/conversion_pixel_to_cm)
-#print "dist_upper_left_50:\t" + str(dist_upper_left_50/conversion_pixel_to_cm)
-#print "dist_upper_left_75:\t" + str(dist_upper_left_75/conversion_pixel_to_cm)
-#
-#speed_upper_left = speed_upper_left_25 = speed_upper_left_50 = speed_upper_left_75 = 0
-#if upper_left / frame_per_sec > 0:
-#    speed_upper_left = dist_upper_left/conversion_pixel_to_cm / ( upper_left /frame_per_sec)
-#if upper_left_25 / frame_per_sec > 0:
-#    speed_upper_left_25 = dist_upper_left_25/conversion_pixel_to_cm/ (upper_left_25/frame_per_sec)
-#if upper_left_50 / frame_per_sec > 0:
-#    speed_upper_left_50 = dist_upper_left_50/conversion_pixel_to_cm/ (upper_left_50/frame_per_sec )
-#if upper_left_75 / frame_per_sec > 0:
-#    speed_upper_left_75 = dist_upper_left_75/conversion_pixel_to_cm/ (upper_left_75/ frame_per_sec )
-#print "speed_upper_left:\t" + str(speed_upper_left)
-#print "speed_upper_left_25:\t" + str(speed_upper_left_25)
-#print "speed_upper_left_50:\t" + str(speed_upper_left_50)
-#print "speed_upper_left_75:\t" + str(speed_upper_left_75)
-#
-#print "upper_left_num_bout:\t" + str(upper_left_num_bout)
-#print "seconds in bout:\t" + str(upper_left_frame_bout / frame_per_sec)
-#
-#print "upper_left_distance_bout:\t" + str(upper_left_distance_bout/conversion_pixel_to_cm)
-#print "upper_left_lap_bout:"
-#print "\t".join(map(str,upper_left_lap_bout))
-#
-#
-#print "----------------------------"
-#print "time_s_lower_left:\t" + str(lower_left/ frame_per_sec)
-#print "time_s_lower_left_25:\t" + str(lower_left_25 / frame_per_sec)
-#print "time_s_lower_left_50:\t" + str(lower_left_50/ frame_per_sec)
-#print "time_s_lower_left_75:\t" + str(lower_left_75/ frame_per_sec)
-#
-#print "dist_lower_left:\t" + str(dist_lower_left/conversion_pixel_to_cm)
-#print "dist_lower_left_25:\t" + str(dist_lower_left_25/conversion_pixel_to_cm)
-#print "dist_lower_left_50:\t" + str(dist_lower_left_50/conversion_pixel_to_cm)
-#print "dist_lower_left_75:\t" + str(dist_lower_left_75/conversion_pixel_to_cm)
-#
-#speed_lower_left = speed_lower_left_25 = speed_lower_left_50 = speed_lower_left_75 = 0
-#if lower_left / frame_per_sec > 0:
-#    speed_lower_left = dist_lower_left/conversion_pixel_to_cm / ( lower_left /frame_per_sec)
-#if lower_left_25 / frame_per_sec > 0:
-#    speed_lower_left_25 = dist_lower_left_25/conversion_pixel_to_cm/ (lower_left_25/frame_per_sec)
-#if lower_left_50 / frame_per_sec > 0:
-#    speed_lower_left_50 = dist_lower_left_50/conversion_pixel_to_cm/ (lower_left_50/frame_per_sec )
-#if lower_left_75 / frame_per_sec > 0:
-#    speed_lower_left_75 = dist_lower_left_75/conversion_pixel_to_cm/ (lower_left_75/ frame_per_sec )
-#print "speed_lower_left:\t" + str(speed_lower_left)
-#print "speed_lower_left_25:\t" + str(speed_lower_left_25)
-#print "speed_lower_left_50:\t" + str(speed_lower_left_50)
-#print "speed_lower_left_75:\t" + str(speed_lower_left_75)
-#
-#print "lower_left_num_bout:\t" + str(lower_left_num_bout)
-#print "seconds in bout:\t" + str(lower_left_frame_bout / frame_per_sec)
-#
-#print "lower_left_distance_bout:\t" + str(lower_left_distance_bout/conversion_pixel_to_cm)
-#print "lower_left_lap_bout:"
-#print "\t".join(map(str,lower_left_lap_bout))
-#
-#
-#print "----------------------------"
-#print "time_s_lower_right:\t" + str(lower_right/ frame_per_sec)
-#print "time_s_lower_right_25:\t" + str(lower_right_25 / frame_per_sec)
-#print "time_s_lower_right_50:\t" + str(lower_right_50/ frame_per_sec)
-#print "time_s_lower_right_75:\t" + str(lower_right_75/ frame_per_sec)
-#
-#print "dist_lower_right:\t" + str(dist_lower_right/conversion_pixel_to_cm)
-#print "dist_lower_right_25:\t" + str(dist_lower_right_25/conversion_pixel_to_cm)
-#print "dist_lower_right_50:\t" + str(dist_lower_right_50/conversion_pixel_to_cm)
-#print "dist_lower_right_75:\t" + str(dist_lower_right_75/conversion_pixel_to_cm)
-#
-#speed_lower_right = speed_lower_right_25 = speed_lower_right_50 = speed_lower_right_75 = 0
-#if lower_right / frame_per_sec > 0:
-#    speed_lower_right = dist_lower_right/conversion_pixel_to_cm / ( lower_right /frame_per_sec)
-#if lower_right_25 / frame_per_sec > 0:
-#    speed_lower_right_25 = dist_lower_right_25/conversion_pixel_to_cm/ (lower_right_25/frame_per_sec)
-#if lower_right_50 / frame_per_sec > 0:
-#    speed_lower_right_50 = dist_lower_right_50/conversion_pixel_to_cm/ (lower_right_50/frame_per_sec )
-#if lower_right_75 / frame_per_sec > 0:
-#    speed_lower_right_75 = dist_lower_right_75/conversion_pixel_to_cm/ (lower_right_75/ frame_per_sec )
-#print "speed_lower_right:\t" + str(speed_lower_right)
-#print "speed_lower_right_25:\t" + str(speed_lower_right_25)
-#print "speed_lower_right_50:\t" + str(speed_lower_right_50)
-#print "speed_lower_right_75:\t" + str(speed_lower_right_75)
-#
-#print "lower_right_num_bout:\t" + str(lower_right_num_bout)
-#print "seconds in bout:\t" + str(lower_right_frame_bout / frame_per_sec)
-#
-#print "lower_right_distance_bout:\t" + str(lower_right_distance_bout/conversion_pixel_to_cm)
-#print "lower_right_lap_bout:"
-#print "\t".join(map(str,lower_right_lap_bout))
 
 wb.save(results_excel)
 
