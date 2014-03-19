@@ -68,15 +68,16 @@ def analyze(frame,frame_name,frame2,x,y,square_25,square_50,square_75,square_100
     #cv2.imshow('blur',frame)
     # convert to hsv and find range of colors
     hsv = cv2.cvtColor(frame3,cv2.COLOR_BGR2HSV)
-    thresh = cv2.inRange(hsv,np.array((0, 0, 1)), np.array((0, 0, 4)))
+    thresh = cv2.inRange(hsv,np.array((0, 0, 1)), np.array((0, 0, 20)))
 
     #res = cv2.morphologyEx(thresh,cv2.MORPH_OPEN,element)
     #cv2.imshow('thresh_first2',res)
     element = cv2.getStructuringElement(cv2.MORPH_ELLIPSE ,(3,3))
+    cv2.erode(thresh,element,thresh,None,2)
     cv2.dilate(thresh,element,thresh,None,10)
     #cv2.imshow('thresh_first',thresh)
-    element = cv2.getStructuringElement(cv2.MORPH_ELLIPSE ,(3,3))
-    cv2.erode(thresh,element,thresh,None,2)
+    #element = cv2.getStructuringElement(cv2.MORPH_ELLIPSE ,(3,3))
+
     #cv2.imshow('thresh_2',thresh)
     #cv2.dilate(thresh,element,thresh,None,10)
     thresh2 = thresh.copy()
@@ -85,16 +86,16 @@ def analyze(frame,frame_name,frame2,x,y,square_25,square_50,square_75,square_100
     contours,hierarchy = cv2.findContours(thresh,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
 
 
-    draw_rect(frame,height,width/2,0.7)
-    draw_rect(frame,height,width/2,0.45)
-    draw_rect(frame,height,width/2,0.2)
+    draw_rect(frame,height,width,0.7)
+    draw_rect(frame,height,width,0.45)
+    draw_rect(frame,height,width,0.2)
     cv2.imshow(frame_name,frame)
 
     # finding contour with maximum area and store it as best_cnt
     max_area = 0
     contours2 = contours
     i = 0
-    best_cnt = 0
+    best_cnt = []
     for cnt in contours:
         area = cv2.contourArea(cnt)
         #print len(cnt)
@@ -107,13 +108,13 @@ def analyze(frame,frame_name,frame2,x,y,square_25,square_50,square_75,square_100
             best_cnt = cnt
 
     cv2.drawContours(frame,contours2,-1,cv.CV_RGB(255,255,0),1)
-    start = tuple([0,height/2])
-    end = tuple([width,height/2])
-    cv2.line(frame,start,end,cv.CV_RGB(255,0,255))
-    start = tuple([width,0])
-    end = tuple([width/2,height])
-    cv2.line(frame,start,end,cv.CV_RGB(255,0,255))
-    cv2.line(frame,start,end,cv.CV_RGB(255,0,255))
+    #start = tuple([0,height/2])
+    #end = tuple([width,height/2])
+    #cv2.line(frame,start,end,cv.CV_RGB(255,0,255))
+    #start = tuple([width,0])
+    #end = tuple([width/2,height])
+    #cv2.line(frame,start,end,cv.CV_RGB(255,0,255))
+    #cv2.line(frame,start,end,cv.CV_RGB(255,0,255))
 
     mid_points = []
     for cnt in contours2:
@@ -180,21 +181,23 @@ def analyze(frame,frame_name,frame2,x,y,square_25,square_50,square_75,square_100
             square_100 = square_100 + 1
 
     # finding centroids of best_cnt and draw a circle there
-    if best_cnt:
-        M = cv2.moments(best_cnt)
-        cx,cy = int(M['m10']/M['m00']), int(M['m01']/M['m00'])
-        cv2.circle(frame,(cx,cy),5,255,-1)
+    #if not best_cnt:
+    #    print "List is empty!"
+    #else:
+    #    M = cv2.moments(best_cnt)
+    #    cx,cy = int(M['m10']/M['m00']), int(M['m01']/M['m00'])
+    #    cv2.circle(frame,(cx,cy),5,255,-1)
 
     # Show it, if key pressed is 'Esc', exit the loop
 
-    cv2.imshow('thresh',thresh2)
-    cv2.imshow('contour',frame2)
-    cv2.imshow('frame',frame)
+    cv2.imshow('%sthresh' % (frame_name),thresh2)
+    cv2.imshow('%scontour' % (frame_name),frame2)
+    cv2.imshow('%sframe' % (frame_name),frame)
     return last_known_point
 
 _,frame2 = cap.read()
-frame2 = cv2.blur(frame2,(15,15))
-imgray = cv2.cvtColor(frame2,cv2.COLOR_BGR2GRAY)
+imgray = cv2.blur(frame2,(15,15))
+imgray = cv2.cvtColor(imgray,cv2.COLOR_BGR2GRAY)
 ret,thresh = cv2.threshold(imgray,170,200,0)
 cv2.imwrite("gray_tra.png",thresh)
 cv2.imshow('thresh',thresh)
@@ -205,8 +208,8 @@ all_y = []
 while not contours:
     _,frame2 = cap.read()
     cv2.imshow('frame2',frame2)
-    #frame2 = cv2.blur(frame2,(17,17))
-    imgray = cv2.cvtColor(frame2,cv2.COLOR_BGR2GRAY)
+    imgray = cv2.blur(frame2,(17,17))
+    imgray = cv2.cvtColor(imgray,cv2.COLOR_BGR2GRAY)
     #cv2.imshow('imgray',imgray)
     ret,thresh = cv2.threshold(imgray,170,200,0)
     #cv2.imwrite("gray_tra.png",thresh)
@@ -236,12 +239,14 @@ diff_width = actual_width - width
 diff_height = actual_height - height
 
 cv_rect_obj = frame2[0:height,0:width]
+frame2 = frame2[0:height,0:width]
 cv2.imwrite("gray_test.png",cv_rect_obj)
 #hsv = cv2.cvtColor(cv_rect_obj,cv2.COLOR_BGR2HSV)
-thresh = cv2.inRange(cv_rect_obj,np.array((90, 90, 90)), np.array((160, 160, 160)))
+imgray = cv2.blur(cv_rect_obj,(15,15))
+thresh = cv2.inRange(imgray,np.array((90, 90, 90)), np.array((160, 160, 160)))
 cv2.imwrite("gray_test3.png",thresh)
 element = cv2.getStructuringElement(cv2.MORPH_ELLIPSE ,(3,3))
-cv2.erode(thresh,element,thresh,None,2)
+cv2.erode(thresh,element,thresh,None,1)
 cv2.dilate(thresh,element,thresh,None,10)
 contours,hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 #cv2.drawContours(cv_rect_obj,contours,-1,cv.CV_RGB(255,255,0),1)
@@ -253,10 +258,11 @@ cnt=contours[max_index]
 x_in,y_in,w_in,h_in = cv2.boundingRect(cnt)
 #cv2.rectangle(cv_rect_obj,(x,y),(x+w,y+h),(0,255,0),2)
 cv_rect_obj = cv_rect_obj[y_in:y_in+h_in,x_in:w_in+x_in]
+frame2 = frame2[y_in:y_in+h_in,x_in:w_in+x_in]
 #cv2.imshow('thresh_first',thresh)
 #element = cv2.getStructuringElement(cv2.MORPH_ELLIPSE ,(3,3))
-
-imgray = cv2.cvtColor(cv_rect_obj,cv2.COLOR_BGR2GRAY)
+imgray = cv2.blur(cv_rect_obj,(15,15))
+imgray = cv2.cvtColor(imgray,cv2.COLOR_BGR2GRAY)
 ret,thresh = cv2.threshold(imgray,170,200,0)
 cv2.imwrite("gray_tra2.png",thresh)
 cv2.imshow('thresh',thresh)
@@ -296,15 +302,15 @@ per25_point2 = [int(width-width*0.2/2+width*0.2),int((height-height*0.2)/2+heigh
 print per25_point2
 
 cv_rect_obj1 = cv_rect_obj[0:height,0:width]
-draw_rect(cv_rect_obj1,height,width,0.7)
-draw_rect(cv_rect_obj1,height,width,0.45)
-draw_rect(cv_rect_obj1,height,width,0.2)
-cv2.imwrite("gray_test3.png",cv_rect_obj1)
+#draw_rect(cv_rect_obj1,height,width,0.7)
+#draw_rect(cv_rect_obj1,height,width,0.45)
+#draw_rect(cv_rect_obj1,height,width,0.2)
+#cv2.imwrite("gray_test3.png",cv_rect_obj1)
 cv_rect_obj2 = cv_rect_obj[0:height,width:width*2]
-draw_rect(cv_rect_obj2,height,width,0.7)
-draw_rect(cv_rect_obj2,height,width,0.45)
-draw_rect(cv_rect_obj2,height,width,0.2)
-cv2.imwrite("gray_test2.png",cv_rect_obj2)
+#draw_rect(cv_rect_obj2,height,width,0.7)
+#draw_rect(cv_rect_obj2,height,width,0.45)
+#draw_rect(cv_rect_obj2,height,width,0.2)
+#cv2.imwrite("gray_test2.png",cv_rect_obj2)
 
 
 
@@ -351,14 +357,14 @@ left_known_point = right_known_point = [0,0]
 
 while(frame_number < total_number_of_frames):
 #while(frame_number < 250):
-    frame_number = cap.get(CV_CAP_PROP_POS_FRAMES)
+    #frame_number = cap.get(CV_CAP_PROP_POS_FRAMES)
     #CV_CAP_PROP_POS_MSEC
     #l = cap.get(CV_CAP_PROP_POS_MSEC)
     #if l <= 1000:
     #    print l
     #    frame_per_sec += 1.0
     # read the frames
-    frame_number = int(frame_number+100)
+
     cap.set(CV_CAP_PROP_POS_FRAMES,frame_number)
     _,frame = cap.read()
     frame = frame[y_in:y_in+h_in,x_in:w_in+x_in]
@@ -371,8 +377,8 @@ while(frame_number < total_number_of_frames):
       sys.stderr.flush()
     #capture = cv.CaptureFromFile("/Users/hayer/Desktop/Anand/openfields/071211_Batch1-openfield.m4v")
 
-    left_side = frame[0:height,0:width/2]
-    right_side = frame[0:height,width/2:width]
+    left_side = frame[0:height,0:width]
+    right_side = frame[0:height,width:width*2]
 
     analyze(left_side,"left",cv_rect_obj1,x_left,y_left,upper_left_25,upper_left_50,
         upper_left_75,upper_left,dist_upper_left_25,dist_upper_left_50,dist_upper_left_75,
@@ -385,6 +391,8 @@ while(frame_number < total_number_of_frames):
 
     if cv2.waitKey(33) == 27:
         break
+
+    frame_number = int(frame_number+100)
 
 
 cv2.imwrite(sample_name + "_tra.png",frame2)
@@ -481,12 +489,22 @@ for i,f in enumerate(upper_right_lap_bout):
 wb.save(results_excel)
 
 ## Draw heatmap
-heatmap, xedges, yedges = np.histogram2d(y, x, bins=50)
+heatmap, xedges, yedges = np.histogram2d(y_left, x_left, bins=50)
 extent = [ yedges[0], yedges[-1], xedges[0], xedges[-1]]
 plt.clf()
 plt.imshow(heatmap, extent=extent)
 cb = plt.colorbar()
 cb.set_label('mean value')
-plt.savefig(sample_name + "_heatmap.png")
+plt.savefig(sample_name + "right_heatmap.png")
+
+
+
+heatmap, xedges, yedges = np.histogram2d(y_right, x_right, bins=50)
+extent = [ yedges[0], yedges[-1], xedges[0], xedges[-1]]
+plt.clf()
+plt.imshow(heatmap, extent=extent)
+cb = plt.colorbar()
+cb.set_label('mean value')
+plt.savefig(sample_name + "left_heatmap.png")
 
 
