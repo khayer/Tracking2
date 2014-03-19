@@ -34,6 +34,11 @@ global per50_point2
 global per75_point1
 global per75_point2
 
+upper_left_25=upper_left_50=upper_left_75=upper_left=dist_upper_left_25=dist_upper_left_50=dist_upper_left_75=dist_upper_left=left_known_point=upper_left_num_bout=upper_left_frame_bout=upper_left_distance_bout=left_counter = 0
+upper_left_lap_bout = []
+upper_right_25=upper_right_50=upper_right_75=upper_right=dist_upper_right_25=dist_upper_right_50=dist_upper_right_75=dist_upper_right=right_known_point=upper_right_num_bout=upper_right_frame_bout=upper_right_distance_bout=right_counter = 0
+upper_right_lap_bout = []
+
 if len(sys.argv) != 3:
     sys.stderr.write("usage: python test.py video_file results.xls\n")
     sys.exit()
@@ -178,6 +183,7 @@ def analyze(frame,frame_name,frame2,x,y,square_25,square_50,square_75,square_100
         elif comp_tuple(mp,per75_point1,per75_point2):
             square_75 = square_75 + 1
         else:
+            print "YOu are stupid"
             square_100 = square_100 + 1
 
     # finding centroids of best_cnt and draw a circle there
