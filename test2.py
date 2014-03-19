@@ -85,33 +85,8 @@ def analyze(frame,frame_name,frame2):
 
     max_area = 0
     contours2 = contours
-    #i = 0
-    #for cnt in contours:
-    #    area = cv2.contourArea(cnt)
-    #    #print len(cnt)
-    #    cnt2 = cv2.convexHull(cnt)
-    #    #print len(cnt2)
-    #    contours2[i] = cnt2
-    #    i = i+1
-    #    if area > max_area:
-    #        max_area = area
-    #        best_cnt = cnt
 
     cv2.drawContours(frame,contours2,-1,cv.CV_RGB(255,255,0),1)
-    start = tuple([0,height/2])
-    end = tuple([width,height/2])
-    cv2.line(frame,start,end,cv.CV_RGB(255,0,255))
-    start = tuple([width,0])
-    end = tuple([width/2,height])
-    cv2.line(frame,start,end,cv.CV_RGB(255,0,255))
-    cv2.line(frame,start,end,cv.CV_RGB(255,0,255))
-
-    #cv2.rectangle(frame,upper_left_75_point1,upper_left_75_point2,cv.CV_RGB(255,0,255))
-    #cv2.rectangle(frame,upper_left_50_point1,upper_left_50_point2,cv.CV_RGB(255,0,255))
-    #cv2.rectangle(frame,upper_left_25_point1,upper_left_25_point2,cv.CV_RGB(255,0,255))
-    #cv2.rectangle(frame,upper_right_75_point1,upper_right_75_point2,cv.CV_RGB(255,0,0))
-    #cv2.rectangle(frame,upper_right_50_point1,upper_right_50_point2,cv.CV_RGB(255,0,0))
-    #cv2.rectangle(frame,upper_right_25_point1,upper_right_25_point2,cv.CV_RGB(255,0,0))
 
     mid_points = []
     for cnt in contours2:
@@ -131,113 +106,14 @@ def analyze(frame,frame_name,frame2):
         cv2.circle(frame2,mid_point, 1, cv.CV_RGB(255,0,0))
         cv2.circle(frame,mid_point, 1, cv.CV_RGB(255,0,0))
 
-    #left_upper_bool = left_lower_bool = right_upper_bool = right_lower_bool = 1
-    #for mp in mid_points:
-#
-    #    if comp_tuple(mp,upper_left_point1,upper_left_point2) and left_upper_bool == 1:
-    #        #var1 = 4 if var1 is None else var1
-    #        left_upper_bool = 0
-    #        last_upper_left = last_upper_left or mp
-    #        distance = dist(last_upper_left,mp)
-    #        if distance > dist_threshold:
-    #            upper_left_i = 0 or upper_left_i
-    #            upper_left_i = upper_left_i + 1
-    #            if upper_left_i == bout_threshold:
-    #                upper_left_num_bout = upper_left_num_bout + 1
-    #                upper_left_lap_bout.append(0)
-    #            if upper_left_i >= bout_threshold:
-    #                cv2.circle(frame,mp, 5, cv.CV_RGB(255,0,0))
-    #                upper_left_frame_bout = upper_left_frame_bout + 1
-    #                upper_left_distance_bout = upper_left_distance_bout + distance
-    #                upper_left_lap_bout[-1] = upper_left_lap_bout[-1] +1
-    #        else:
-    #            distance = 0
-    #            upper_left_i = 0
-#
-    #        if comp_tuple(mp,upper_left_25_point1,upper_left_25_point2):
-    #            dist_upper_left_25 = dist_upper_left_25 + distance
-    #            upper_left_25 = upper_left_25 + 1
-    #        elif comp_tuple(mp,upper_left_50_point1,upper_left_50_point2):
-    #            upper_left_50 = upper_left_50 + 1
-    #            dist_upper_left_50 = dist_upper_left_50 + distance
-    #        elif comp_tuple(mp,upper_left_75_point1,upper_left_75_point2):
-    #            upper_left_75 = upper_left_75 + 1
-    #            dist_upper_left_75 = dist_upper_left_75 + distance
-    #        else:
-    #            upper_left = upper_left + 1
-    #            dist_upper_left = dist_upper_left + distance
-    #        last_upper_left = mp
-    #        upper_left_last_known_point = mp
-#
-    #    if comp_tuple(mp,upper_right_point1,upper_right_point2) and right_upper_bool ==1 :
-    #        right_upper_bool = 0
-    #        last_upper_right = last_upper_right or mp
-    #        distance = dist(last_upper_right,mp)
-    #        if distance > dist_threshold:
-    #            upper_right_i = 0 or upper_right_i
-    #            upper_right_i = upper_right_i + 1
-    #            if upper_right_i == bout_threshold:
-    #                upper_right_num_bout = upper_right_num_bout + 1
-    #                upper_right_lap_bout.append(0)
-    #            if upper_right_i >= bout_threshold:
-    #                cv2.circle(frame,mp, 5, cv.CV_RGB(255,0,0))
-    #                upper_right_frame_bout = upper_right_frame_bout + 1
-    #                upper_right_distance_bout = upper_right_distance_bout + distance
-    #                upper_right_lap_bout[-1] = upper_right_lap_bout[-1] +1
-    #        else:
-    #            distance = 0
-    #            upper_right_i = 0
-    #        if comp_tuple(mp,upper_right_25_point1,upper_right_25_point2):
-    #            dist_upper_right_25 = dist_upper_right_25 + distance
-    #            upper_right_25 = upper_right_25 + 1
-    #        elif comp_tuple(mp,upper_right_50_point1,upper_right_50_point2):
-    #            upper_right_50 = upper_right_50 + 1
-    #            dist_upper_right_50 = dist_upper_right_50 + distance
-    #        elif comp_tuple(mp,upper_right_75_point1,upper_right_75_point2):
-    #            upper_right_75 = upper_right_75 + 1
-    #            dist_upper_right_75 = dist_upper_right_75 + distance
-    #        else:
-    #            upper_right = upper_right + 1
-    #            dist_upper_right = dist_upper_right + distance
-    #        last_upper_right = mp
-    #        upper_right_last_known_point = mp
-#
-    #if left_upper_bool == 1:
-    #    mp = upper_left_last_known_point
-    #    if comp_tuple(mp,upper_left_25_point1,upper_left_25_point2):
-    #        upper_left_25 = upper_left_25 + 1
-    #    elif comp_tuple(mp,upper_left_50_point1,upper_left_50_point2):
-    #        upper_left_50 = upper_left_50 + 1
-    #    elif comp_tuple(mp,upper_left_75_point1,upper_left_75_point2):
-    #        upper_left_75 = upper_left_75 + 1
-    #    else:
-    #        upper_left = upper_left + 1
-    #if right_upper_bool == 1:
-    #    mp = upper_right_last_known_point
-    #    if comp_tuple(mp,upper_right_25_point1,upper_right_25_point2):
-    #        upper_right_25 = upper_right_25 + 1
-    #    elif comp_tuple(mp,upper_right_50_point1,upper_right_50_point2):
-    #        upper_right_50 = upper_right_50 + 1
-    #    elif comp_tuple(mp,upper_right_75_point1,upper_right_75_point2):
-    #        upper_right_75 = upper_right_75 + 1
-    #    else:
-    #        upper_right = upper_right + 1
-    #print contours
-    # finding centroids of best_cnt and draw a circle there
-    #M = cv2.moments(best_cnt)
-    #cx,cy = int(M['m10']/M['m00']), int(M['m01']/M['m00'])
-    #cv2.circle(frame,(cx,cy),5,255,-1)
-
-    # Show it, if key pressed is 'Esc', exit the loop
-
-    cv2.imshow('thresh',thresh2)
-    cv2.imshow('contour',frame2)
-    cv2.imshow('frame',frame)
+    cv2.imshow('%sthresh' % (frame_name),thresh2)
+    cv2.imshow('%scontour' % (frame_name),frame2)
+    cv2.imshow('%sframe' % (frame_name),frame)
     
 
 _,frame2 = cap.read()
-frame2 = cv2.blur(frame2,(15,15))
-imgray = cv2.cvtColor(frame2,cv2.COLOR_BGR2GRAY)
+imgray = cv2.blur(frame2,(15,15))
+imgray = cv2.cvtColor(imgray,cv2.COLOR_BGR2GRAY)
 ret,thresh = cv2.threshold(imgray,170,200,0)
 cv2.imwrite("gray_tra.png",thresh)
 cv2.imshow('thresh',thresh)
@@ -248,8 +124,8 @@ all_y = []
 while not contours:
     _,frame2 = cap.read()
     cv2.imshow('frame2',frame2)
-    #frame2 = cv2.blur(frame2,(17,17))
-    imgray = cv2.cvtColor(frame2,cv2.COLOR_BGR2GRAY)
+    imgray = cv2.blur(frame2,(15,15))
+    imgray = cv2.cvtColor(imgray,cv2.COLOR_BGR2GRAY)
     #cv2.imshow('imgray',imgray)
     ret,thresh = cv2.threshold(imgray,170,200,0)
     #cv2.imwrite("gray_tra.png",thresh)
@@ -279,9 +155,12 @@ diff_width = actual_width - width
 diff_height = actual_height - height
 
 cv_rect_obj = frame2[0:height,0:width]
+frame2= frame2[0:height,0:width]
 cv2.imwrite("gray_test.png",cv_rect_obj)
 #hsv = cv2.cvtColor(cv_rect_obj,cv2.COLOR_BGR2HSV)
-thresh = cv2.inRange(cv_rect_obj,np.array((90, 90, 90)), np.array((160, 160, 160)))
+imgray = cv2.blur(cv_rect_obj,(15,15))
+
+thresh = cv2.inRange(imgray,np.array((90, 90, 90)), np.array((160, 160, 160)))
 cv2.imwrite("gray_test3.png",thresh)
 element = cv2.getStructuringElement(cv2.MORPH_ELLIPSE ,(3,3))
 cv2.erode(thresh,element,thresh,None,2)
@@ -296,10 +175,11 @@ cnt=contours[max_index]
 x_in,y_in,w_in,h_in = cv2.boundingRect(cnt)
 #cv2.rectangle(cv_rect_obj,(x,y),(x+w,y+h),(0,255,0),2)
 cv_rect_obj = cv_rect_obj[y_in:y_in+h_in,x_in:w_in+x_in]
+frame2 = frame2[y_in:y_in+h_in,x_in:w_in+x_in]
 #cv2.imshow('thresh_first',thresh)
 #element = cv2.getStructuringElement(cv2.MORPH_ELLIPSE ,(3,3))
-
-imgray = cv2.cvtColor(cv_rect_obj,cv2.COLOR_BGR2GRAY)
+imgray = cv2.blur(cv_rect_obj,(15,15))
+imgray = cv2.cvtColor(imgray,cv2.COLOR_BGR2GRAY)
 ret,thresh = cv2.threshold(imgray,170,200,0)
 cv2.imwrite("gray_tra2.png",thresh)
 cv2.imshow('thresh',thresh)
@@ -328,16 +208,8 @@ def draw_rect(pic,height,width,percentage):
     cv2.rectangle(pic,(x,y),(x+w,y+h),(0,255,0),1)
     return
 
-cv_rect_obj1 = cv_rect_obj[0:height,0:width/2]
-draw_rect(cv_rect_obj1,height,width/2,0.7)
-draw_rect(cv_rect_obj1,height,width/2,0.45)
-draw_rect(cv_rect_obj1,height,width/2,0.2)
-cv2.imwrite("gray_test3.png",cv_rect_obj1)
-cv_rect_obj2 = cv_rect_obj[0:height,width/2:width]
-draw_rect(cv_rect_obj2,height,width/2,0.7)
-draw_rect(cv_rect_obj2,height,width/2,0.45)
-draw_rect(cv_rect_obj2,height,width/2,0.2)
-cv2.imwrite("gray_test2.png",cv_rect_obj2)
+cv_rect_obj1 = frame2[0:height,0:width/2]
+cv_rect_obj2 = frame2[0:height,width/2:width]
 
 def comp_tuple(mp,pt1,pt2):
     return mp[0] >= pt1[0] and mp[0] <= pt2[0] and mp[1] >= pt1[1] and mp[1] <= pt2[1]
@@ -378,7 +250,7 @@ while(frame_number < total_number_of_frames):
     #    print l
     #    frame_per_sec += 1.0
     # read the frames
-    frame_number = int(frame_number+100)
+    frame_number = int(frame_number+10)
     cap.set(CV_CAP_PROP_POS_FRAMES,frame_number)
     _,frame = cap.read()
     frame = frame[y_in:y_in+h_in,x_in:w_in+x_in]
@@ -459,7 +331,7 @@ for i,f in enumerate(upper_left_lap_bout):
     w_sheet.write(r_sheet.nrows+2,i+16,f)
 
 ### UPPER RIGHT
-w_sheet.write(r_sheet.nrows+3,0,"upper_right")
+w_sheet.write(r_sheet.nrows+3,0,"right")
 # TIME
 w_sheet.write(r_sheet.nrows+3,1,(upper_right    / frame_per_sec))
 w_sheet.write(r_sheet.nrows+3,2,(upper_right_75 / frame_per_sec))
@@ -502,5 +374,3 @@ plt.imshow(heatmap, extent=extent)
 cb = plt.colorbar()
 cb.set_label('mean value')
 plt.savefig(sample_name + "_heatmap.png")
-
-
