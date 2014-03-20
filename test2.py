@@ -34,6 +34,14 @@ global per50_point2
 global per75_point1
 global per75_point2
 
+class ExperimentMetrics(object):
+    square_25=square_50=upper_left_75=upper_left=dist_upper_left_25=dist_upper_left_50=dist_upper_left_75=dist_upper_left=left_known_point=upper_left_num_bout=upper_left_frame_bout=upper_left_distance_bout=left_counter = 0
+    upper_left_lap_bout = []
+
+    # The class "constructor" - It's actually an initializer 
+    #def __init__():
+        
+
 upper_left_25=upper_left_50=upper_left_75=upper_left=dist_upper_left_25=dist_upper_left_50=dist_upper_left_75=dist_upper_left=left_known_point=upper_left_num_bout=upper_left_frame_bout=upper_left_distance_bout=left_counter = 0
 upper_left_lap_bout = []
 upper_right_25=upper_right_50=upper_right_75=upper_right=dist_upper_right_25=dist_upper_right_50=dist_upper_right_75=dist_upper_right=right_known_point=upper_right_num_bout=upper_right_frame_bout=upper_right_distance_bout=right_counter = 0
@@ -66,7 +74,7 @@ print frame_per_sec
 
 def analyze(frame,frame_name,frame2,x,y,square_25,square_50,square_75,square_100,
     dist_square_25,dist_square_50,dist_square_75,dist_square_100,last_known_point,
-    num_bout,frame_bout,distance_bout,lap_bout,counter):
+    num_bout,frame_bout,distance_bout,lap_bout,counter,exp_obj):
     # smooth it
     #cv2.imshow('before',frame)
     frame3 = cv2.blur(frame,(17,17))
@@ -162,9 +170,11 @@ def analyze(frame,frame_name,frame2,x,y,square_25,square_50,square_75,square_100
         if comp_tuple(mp,per25_point1,per25_point2):
             dist_square_25 = dist_square_25 + distance
             square_25 = square_25 + 1
+            exp_obj.square_25 = exp_obj.square_25 + 1
         elif comp_tuple(mp,per50_point1,per50_point2):
             square_50 = square_50 + 1
             dist_square_50 = dist_square_50 + distance
+            exp_obj.square_50 = exp_obj.square_50 + 1
         elif comp_tuple(mp,per75_point1,per75_point2):
             square_75 = square_75 + 1
             dist_square_75 = dist_square_75 + distance
@@ -178,8 +188,10 @@ def analyze(frame,frame_name,frame2,x,y,square_25,square_50,square_75,square_100
         mp = last_known_point
         if comp_tuple(mp,per25_point1,per25_point2):
             square_25 = square_25 + 1
+            exp_obj.square_25 = exp_obj.square_25 + 1
         elif comp_tuple(mp,per50_point1,per50_point2):
             square_50 = square_50 + 1
+            exp_obj.square_50 = exp_obj.square_50 + 1
         elif comp_tuple(mp,per75_point1,per75_point2):
             square_75 = square_75 + 1
         else:
@@ -361,6 +373,9 @@ time_in_msec = 0
 #frame_per_sec = 0
 left_known_point = right_known_point = [0,0]
 
+left_object = ExperimentMetrics()
+right_object =ExperimentMetrics()
+
 while(frame_number < total_number_of_frames):
 #while(frame_number < 250):
     #frame_number = cap.get(CV_CAP_PROP_POS_FRAMES)
@@ -385,27 +400,30 @@ while(frame_number < total_number_of_frames):
 
     left_side = frame[0:height,0:width]
     right_side = frame[0:height,width:width*2]
-
+    upper_left_25 = upper_left_25 +1
     analyze(left_side,"left",cv_rect_obj1,x_left,y_left,upper_left_25,upper_left_50,
         upper_left_75,upper_left,dist_upper_left_25,dist_upper_left_50,dist_upper_left_75,
         dist_upper_left,left_known_point,upper_left_num_bout,upper_left_frame_bout,
-        upper_left_distance_bout,upper_left_lap_bout,left_counter)
+        upper_left_distance_bout,upper_left_lap_bout,left_counter,left_object)
+    print left_object.square_50
     analyze(right_side,"right",cv_rect_obj2,x_right,y_right,upper_right_25,upper_right_50,
         upper_right_75,upper_right,dist_upper_right_25,dist_upper_right_50,dist_upper_right_75,
         dist_upper_right,right_known_point,upper_right_num_bout,upper_right_frame_bout,
-        upper_right_distance_bout,upper_right_lap_bout,right_counter)
-
+        upper_right_distance_bout,upper_right_lap_bout,right_counter,right_object)
+    print right_object.square_50
     if cv2.waitKey(33) == 27:
         break
 
-    frame_number = int(frame_number+100)
+    frame_number = int(frame_number+1000)
 
 
 cv2.imwrite(sample_name + "_tra.png",frame2)
 # Clean up everything before leaving
 cv2.destroyAllWindows()
 
-
+print "ENDE"
+print left_object.square_50
+print right_object.square_50
 #all_frames = upper_left + upper_left_75 + upper_left_50 + upper_left_25
 #frame_per_sec = 360000/all_frames
 #print frame_per_sec
