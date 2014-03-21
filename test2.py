@@ -35,7 +35,8 @@ global per75_point1
 global per75_point2
 
 class ExperimentMetrics(object):
-    square_25=square_50=square_75=square_100=dist_square_25=dist_square_50=dist_square_75=dist_square_100=last_known_point=square_num_bout=square_frame_bout=square_distance_bout=counter = 0
+    square_25=square_50=square_75=square_100=dist_square_25=dist_square_50=dist_square_75=dist_square_100=square_num_bout=square_frame_bout=square_distance_bout=counter = 0
+    last_known_point= [0,0]
     square_lap_bout = []
 
     # The class "constructor" - It's actually an initializer
@@ -67,7 +68,8 @@ print cap.isOpened()
 total_number_of_frames = cap.get(CV_CAP_PROP_FRAME_COUNT)
 print "Total number of frames"
 print total_number_of_frames
-frame_per_sec = 30.03888889
+frame_per_sec = cap.get(CV_CAP_PROP_FPS)
+##frame_per_sec = 30.03888889
 print "Frame per sec"
 print frame_per_sec
 
@@ -150,22 +152,21 @@ def analyze(frame,frame_name,frame2,x,y,square_25,square_50,square_75,square_100
     in_mid_points = 0
     for mp in mid_points:
         in_mid_points = 1
-        last_known_point = last_known_point or mp
-        distance = dist(last_known_point,mp)
+        exp_obj.last_known_point = exp_obj.last_known_point or mp
+        distance = dist(exp_obj.last_known_point,mp)
         if distance > dist_threshold:
-            counter = 0 or counter
-            counter = counter + 1
-            if counter == bout_threshold:
-                num_bout = num_bout + 1
-                lap_bout.append(0)
-            if counter >= bout_threshold:
+            exp_obj.counter = exp_obj.counter + 1
+            if exp_obj.counter == bout_threshold:
+                exp_obj.square_num_bout = exp_obj.square_num_bout + 1
+                exp_obj.square_lap_bout.append(0)
+            if exp_obj.counter >= bout_threshold:
                 cv2.circle(frame,mp, 5, cv.CV_RGB(255,0,0))
-                frame_bout = frame_bout + 1
-                distance_bout = distance_bout + distance
-                lap_bout[-1] = lap_bout[-1] +1
+                exp_obj.square_frame_bout = exp_obj.square_frame_bout + 1
+                exp_obj.square_distance_bout = exp_obj.square_distance_bout + distance
+                exp_obj.square_lap_bout[-1] = exp_obj.square_lap_bout[-1] +1
         else:
             distance = 0
-            counter = 0
+            exp_obj.counter = 0
 
         if comp_tuple(mp,per25_point1,per25_point2):
             exp_obj.dist_square_25 = exp_obj.dist_square_25 + distance
@@ -179,11 +180,12 @@ def analyze(frame,frame_name,frame2,x,y,square_25,square_50,square_75,square_100
         else:
             exp_obj.square_100 = exp_obj.square_100 + 1
             exp_obj.dist_square_100 = exp_obj.dist_square_100 + distance
-        last_point = mp
-        last_known_point = mp
+        exp_obj.last_known_point = mp
+        break
+        #last_known_point = mp
 
     if in_mid_points == 0:
-        mp = last_known_point
+        mp = exp_obj.last_known_point
         if comp_tuple(mp,per25_point1,per25_point2):
             exp_obj.square_25 = exp_obj.square_25 + 1
         elif comp_tuple(mp,per50_point1,per50_point2):
@@ -191,7 +193,6 @@ def analyze(frame,frame_name,frame2,x,y,square_25,square_50,square_75,square_100
         elif comp_tuple(mp,per75_point1,per75_point2):
             exp_obj.square_75 = exp_obj.square_75 + 1
         else:
-            print "YOu are stupid"
             exp_obj.square_100 = exp_obj.square_100 + 1
 
     # finding centroids of best_cnt and draw a circle there
@@ -401,16 +402,16 @@ while(frame_number < total_number_of_frames):
         upper_left_75,upper_left,dist_upper_left_25,dist_upper_left_50,dist_upper_left_75,
         dist_upper_left,left_known_point,upper_left_num_bout,upper_left_frame_bout,
         upper_left_distance_bout,upper_left_lap_bout,left_counter,left_object)
-    print left_object.square_50
+    #print left_object.square_50
     analyze(right_side,"right",cv_rect_obj2,x_right,y_right,upper_right_25,upper_right_50,
         upper_right_75,upper_right,dist_upper_right_25,dist_upper_right_50,dist_upper_right_75,
         dist_upper_right,right_known_point,upper_right_num_bout,upper_right_frame_bout,
         upper_right_distance_bout,upper_right_lap_bout,right_counter,right_object)
-    print right_object.square_50
+    #print right_object.square_50
     if cv2.waitKey(33) == 27:
         break
 
-    frame_number = int(frame_number+1000)
+    frame_number = int(frame_number+5)
 
 
 cv2.imwrite(sample_name + "_tra.png",frame2)
@@ -418,8 +419,8 @@ cv2.imwrite(sample_name + "_tra.png",frame2)
 cv2.destroyAllWindows()
 
 print "ENDE"
-print left_object.square_50
-print right_object.square_50
+#print left_object.square_50
+#print right_object.square_50
 #all_frames = upper_left + upper_left_75 + upper_left_50 + upper_left_25
 #frame_per_sec = 360000/all_frames
 #print frame_per_sec
@@ -440,7 +441,7 @@ w_sheet = wb.get_sheet(0)
 
 w_sheet.write(r_sheet.nrows+1,0,"Results for " + sample_name)
 ### UPPER LEFT
-w_sheet.write(r_sheet.nrows+2,0,"upper_left")
+w_sheet.write(r_sheet.nrows+2,0,"Left")
 # TIME
 w_sheet.write(r_sheet.nrows+2,1,(left_object.square_100    / frame_per_sec))
 w_sheet.write(r_sheet.nrows+2,2,(left_object.square_75 / frame_per_sec))
@@ -453,13 +454,13 @@ w_sheet.write(r_sheet.nrows+2,7,(left_object.dist_square_50 / conversion_pixel_t
 w_sheet.write(r_sheet.nrows+2,8,(left_object.dist_square_25 / conversion_pixel_to_cm))
 # SPEED
 speed_upper_left = speed_upper_left_25 = speed_upper_left_50 = speed_upper_left_75 = 0
-if upper_left / frame_per_sec > 0:
+if left_object.square_100 / frame_per_sec > 0:
     speed_upper_left = left_object.dist_square_100 /conversion_pixel_to_cm / ( left_object.square_100 /frame_per_sec)
-if upper_left_25 / frame_per_sec > 0:
+if left_object.square_25 / frame_per_sec > 0:
     speed_upper_left_25 = left_object.dist_square_25 /conversion_pixel_to_cm/ (left_object.square_25/frame_per_sec)
-if upper_left_50 / frame_per_sec > 0:
+if left_object.square_50 / frame_per_sec > 0:
     speed_upper_left_50 = left_object.dist_square_50 /conversion_pixel_to_cm/ (left_object.square_50/frame_per_sec )
-if upper_left_75 / frame_per_sec > 0:
+if left_object.square_75 / frame_per_sec > 0:
     speed_upper_left_75 = left_object.dist_square_75 /conversion_pixel_to_cm/ (left_object.square_75/ frame_per_sec )
 w_sheet.write(r_sheet.nrows+2,9,(speed_upper_left))
 w_sheet.write(r_sheet.nrows+2,10,(speed_upper_left_75))
@@ -473,36 +474,36 @@ for i,f in enumerate(left_object.square_lap_bout):
     w_sheet.write(r_sheet.nrows+2,i+16,f)
 
 ### UPPER RIGHT
-w_sheet.write(r_sheet.nrows+3,0,"upper_right")
+w_sheet.write(r_sheet.nrows+3,0,"Right")
 # TIME
-w_sheet.write(r_sheet.nrows+3,1,(upper_right    / frame_per_sec))
-w_sheet.write(r_sheet.nrows+3,2,(upper_right_75 / frame_per_sec))
-w_sheet.write(r_sheet.nrows+3,3,(upper_right_50 / frame_per_sec))
-w_sheet.write(r_sheet.nrows+3,4,(upper_right_25 / frame_per_sec))
+w_sheet.write(r_sheet.nrows+3,1,(right_object.square_100    / frame_per_sec))
+w_sheet.write(r_sheet.nrows+3,2,(right_object.square_75 / frame_per_sec))
+w_sheet.write(r_sheet.nrows+3,3,(right_object.square_50 / frame_per_sec))
+w_sheet.write(r_sheet.nrows+3,4,(right_object.square_25 / frame_per_sec))
 # DISTANCE
-w_sheet.write(r_sheet.nrows+3,5,(dist_upper_right /conversion_pixel_to_cm))
-w_sheet.write(r_sheet.nrows+3,6,(dist_upper_right_75 / conversion_pixel_to_cm))
-w_sheet.write(r_sheet.nrows+3,7,(dist_upper_right_50 / conversion_pixel_to_cm))
-w_sheet.write(r_sheet.nrows+3,8,(dist_upper_right_25 / conversion_pixel_to_cm))
+w_sheet.write(r_sheet.nrows+3,5,(right_object.dist_square_100 /conversion_pixel_to_cm))
+w_sheet.write(r_sheet.nrows+3,6,(right_object.dist_square_75 / conversion_pixel_to_cm))
+w_sheet.write(r_sheet.nrows+3,7,(right_object.dist_square_50 / conversion_pixel_to_cm))
+w_sheet.write(r_sheet.nrows+3,8,(right_object.dist_square_25 / conversion_pixel_to_cm))
 # SPEED
 speed_upper_right = speed_upper_right_25 = speed_upper_right_50 = speed_upper_right_75 = 0
-if upper_right / frame_per_sec > 0:
-    speed_upper_right = dist_upper_right/conversion_pixel_to_cm / ( upper_right /frame_per_sec)
-if upper_right_25 / frame_per_sec > 0:
-    speed_upper_right_25 = dist_upper_right_25/conversion_pixel_to_cm/ (upper_right_25/frame_per_sec)
-if upper_right_50 / frame_per_sec > 0:
-    speed_upper_right_50 = dist_upper_right_50/conversion_pixel_to_cm/ (upper_right_50/frame_per_sec )
-if upper_right_75 / frame_per_sec > 0:
-    speed_upper_right_75 = dist_upper_right_75/conversion_pixel_to_cm/ (upper_right_75/ frame_per_sec )
+if right_object.square_100 / frame_per_sec > 0:
+    speed_upper_right = right_object.dist_square_100 /conversion_pixel_to_cm / ( right_object.square_100 /frame_per_sec)
+if right_object.square_25 / frame_per_sec > 0:
+    speed_upper_right_25 = right_object.dist_square_25 /conversion_pixel_to_cm/ (right_object.square_25/frame_per_sec)
+if right_object.square_50 / frame_per_sec > 0:
+    speed_upper_right_50 = right_object.dist_square_50 /conversion_pixel_to_cm/ (right_object.square_50/frame_per_sec )
+if right_object.square_75 / frame_per_sec > 0:
+    speed_upper_right_75 = right_object.dist_square_75 /conversion_pixel_to_cm/ (right_object.square_75/ frame_per_sec )
 w_sheet.write(r_sheet.nrows+3,9,(speed_upper_right))
 w_sheet.write(r_sheet.nrows+3,10,(speed_upper_right_75))
 w_sheet.write(r_sheet.nrows+3,11,(speed_upper_right_50))
 w_sheet.write(r_sheet.nrows+3,12,(speed_upper_right_25))
 # BOUTS
-w_sheet.write(r_sheet.nrows+3,13,(upper_right_num_bout))
-w_sheet.write(r_sheet.nrows+3,14,(upper_right_frame_bout / frame_per_sec))
-w_sheet.write(r_sheet.nrows+3,15,(upper_right_distance_bout/conversion_pixel_to_cm))
-for i,f in enumerate(upper_right_lap_bout):
+w_sheet.write(r_sheet.nrows+3,13,(right_object.square_num_bout))
+w_sheet.write(r_sheet.nrows+3,14,(right_object.square_frame_bout / frame_per_sec))
+w_sheet.write(r_sheet.nrows+3,15,(right_object.square_distance_bout/conversion_pixel_to_cm))
+for i,f in enumerate(right_object.square_lap_bout):
     w_sheet.write(r_sheet.nrows+3,i+16,f)
 
 
