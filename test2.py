@@ -27,17 +27,11 @@ CV_CAP_PROP_MODE = 9
 #CV_CAP_PROP_WHITE_BALANCE Currently not supported
 #CV_CAP_PROP_RECTIFICATION
 
-global per25_point1
-global per25_point2
-global per50_point1
-global per50_point2
-global per75_point1
-global per75_point2
-
 class ExperimentMetrics(object):
     square_25=square_50=square_75=square_100=dist_square_25=dist_square_50=dist_square_75=dist_square_100=square_num_bout=square_frame_bout=square_distance_bout=counter = 0
     last_known_point= [0,0]
     square_lap_bout = []
+    per25_point1 = per25_point2 = per50_point1 = per50_point2 = per75_point1 = per75_point2 = [0,0]
 
     # The class "constructor" - It's actually an initializer
     #def __init__():
@@ -73,12 +67,28 @@ frame_per_sec = cap.get(CV_CAP_PROP_FPS)
 print "Frame per sec"
 print frame_per_sec
 
+def draw_rect(pic,height,width,percentage):
+    w = int(width*percentage)
+    x = int((width-width*percentage)/2)
+    h = int(height*percentage)
+    y = int((height-height*percentage)/2)
+    cv2.rectangle(pic,(x,y),(x+w,y+h),(0,255,0),1)
+    return
 
-def analyze(frame,frame_name,frame2,x,y,square_25,square_50,square_75,square_100,
-    dist_square_25,dist_square_50,dist_square_75,dist_square_100,last_known_point,
-    num_bout,frame_bout,distance_bout,lap_bout,counter,exp_obj):
+
+def comp_tuple(mp,pt1,pt2):
+    return mp[0] >= pt1[0] and mp[0] <= pt2[0] and mp[1] >= pt1[1] and mp[1] <= pt2[1]
+
+def dist(pt1,pt2):
+    xd = pt2[0] - pt1[0]
+    yd = pt2[1] - pt1[1]
+    return math.sqrt(xd*xd + yd*yd)
+
+
+def analyze(frame,frame_name,frame2,x,y,exp_obj,width):
     # smooth it
     #cv2.imshow('before',frame)
+    #width = frame2.get(CV_CAP_PROP_FRAME_WIDTH)
     frame3 = cv2.blur(frame,(17,17))
     #cv2.imshow('blur',frame)
     # convert to hsv and find range of colors
@@ -104,7 +114,10 @@ def analyze(frame,frame_name,frame2,x,y,square_25,square_50,square_75,square_100
     draw_rect(frame,height,width,0.7)
     draw_rect(frame,height,width,0.45)
     draw_rect(frame,height,width,0.2)
-    cv2.imshow(frame_name,frame)
+    #x = exp_obj.per25_point1[0]
+    #y = exp_obj.per25_point1[1]
+    cv2.rectangle(frame,tuple(exp_obj.per25_point1),tuple(exp_obj.per25_point2),(255,0,0),1)
+    #cv2.imshow(frame_name,frame)
 
     # finding contour with maximum area and store it as best_cnt
     max_area = 0
@@ -160,7 +173,7 @@ def analyze(frame,frame_name,frame2,x,y,square_25,square_50,square_75,square_100
                 exp_obj.square_num_bout = exp_obj.square_num_bout + 1
                 exp_obj.square_lap_bout.append(0)
             if exp_obj.counter >= bout_threshold:
-                cv2.circle(frame,mp, 5, cv.CV_RGB(255,0,0))
+                cv2.circle(frame,mp, 5, cv.CV_RGB(255,0,255))
                 exp_obj.square_frame_bout = exp_obj.square_frame_bout + 1
                 exp_obj.square_distance_bout = exp_obj.square_distance_bout + distance
                 exp_obj.square_lap_bout[-1] = exp_obj.square_lap_bout[-1] +1
@@ -168,13 +181,13 @@ def analyze(frame,frame_name,frame2,x,y,square_25,square_50,square_75,square_100
             distance = 0
             exp_obj.counter = 0
 
-        if comp_tuple(mp,per25_point1,per25_point2):
+        if comp_tuple(mp,exp_obj.per25_point1,exp_obj.per25_point2):
             exp_obj.dist_square_25 = exp_obj.dist_square_25 + distance
             exp_obj.square_25 = exp_obj.square_25 + 1
-        elif comp_tuple(mp,per50_point1,per50_point2):
+        elif comp_tuple(mp,exp_obj.per50_point1,exp_obj.per50_point2):
             exp_obj.square_50 = exp_obj.square_50 + 1
             exp_obj.dist_square_50 = exp_obj.dist_square_50 + distance
-        elif comp_tuple(mp,per75_point1,per75_point2):
+        elif comp_tuple(mp,exp_obj.per75_point1,exp_obj.per75_point2):
             exp_obj.square_75 = exp_obj.square_75 + 1
             exp_obj.dist_square_75 = exp_obj.dist_square_75 + distance
         else:
@@ -186,11 +199,11 @@ def analyze(frame,frame_name,frame2,x,y,square_25,square_50,square_75,square_100
 
     if in_mid_points == 0:
         mp = exp_obj.last_known_point
-        if comp_tuple(mp,per25_point1,per25_point2):
+        if comp_tuple(mp,exp_obj.per25_point1,exp_obj.per25_point2):
             exp_obj.square_25 = exp_obj.square_25 + 1
-        elif comp_tuple(mp,per50_point1,per50_point2):
+        elif comp_tuple(mp,exp_obj.per50_point1,exp_obj.per50_point2):
             exp_obj.square_50 = exp_obj.square_50 + 1
-        elif comp_tuple(mp,per75_point1,per75_point2):
+        elif comp_tuple(mp,exp_obj.per75_point1,exp_obj.per75_point2):
             exp_obj.square_75 = exp_obj.square_75 + 1
         else:
             exp_obj.square_100 = exp_obj.square_100 + 1
@@ -205,28 +218,34 @@ def analyze(frame,frame_name,frame2,x,y,square_25,square_50,square_75,square_100
 
     # Show it, if key pressed is 'Esc', exit the loop
 
-    cv2.imshow('%sthresh' % (frame_name),thresh2)
-    cv2.imshow('%scontour' % (frame_name),frame2)
+    #cv2.imshow('%sthresh' % (frame_name),thresh2)
+    #cv2.imshow('%scontour' % (frame_name),frame2)
     cv2.imshow('%sframe' % (frame_name),frame)
-    return last_known_point
+    return
 
 _,frame2 = cap.read()
 imgray = cv2.blur(frame2,(15,15))
-imgray = cv2.cvtColor(imgray,cv2.COLOR_BGR2GRAY)
-ret,thresh = cv2.threshold(imgray,100,170,0)
+thresh = cv2.inRange(imgray,np.array((110,110,110)), np.array((300, 300, 300)))
+element = cv2.getStructuringElement(cv2.MORPH_ELLIPSE ,(5,5))
+cv2.erode(thresh,element,thresh,None,6)
+cv2.dilate(thresh,element,thresh,None,10)
+
 cv2.imwrite("gray_tra.png",thresh)
 cv2.imshow('thresh',thresh)
 contours,hierarchy = cv2.findContours(thresh,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
 num_p = 0
 all_x = []
 all_y = []
+actual_width = int(cap.get(3))
+actual_height = int(cap.get(4))
 while not contours:
     _,frame2 = cap.read()
     cv2.imshow('frame2',frame2)
-    imgray = cv2.blur(frame2,(17,17))
-    imgray = cv2.cvtColor(imgray,cv2.COLOR_BGR2GRAY)
+    imgray = cv2.blur(frame2,(15,15))
+    thresh = cv2.inRange(imgray,np.array((110,110,110)), np.array((300, 300, 300)))
+    #imgray = cv2.cvtColor(imgray,cv2.COLOR_BGR2GRAY)
     #cv2.imshow('imgray',imgray)
-    ret,thresh = cv2.threshold(imgray,170,200,0)
+    #ret,thresh = cv2.threshold(imgray,170,200,0)
     #cv2.imwrite("gray_tra.png",thresh)
     #cv2.imshow('thresh',thresh)
     contours,hierarchy = cv2.findContours(thresh,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
@@ -236,7 +255,7 @@ for cnt in contours:
         num_p = num_p + 1
         x = point[0][0]
         y = point[0][1]
-        if x > 20 and x < 640 and y > 20 and y < 460:
+        if x > (actual_width/2)-(actual_width/2)*0.7 and x<(actual_width/2)+(actual_width/2)*0.7 and y > (actual_height/2)-(actual_height/2)*0.7 and y < (actual_height/2)+(actual_height/2)*0.7 : # and y > 20 and y < 460:
             all_x.append(x)
             all_y.append(y)
 print (all_x)
@@ -244,11 +263,10 @@ print (all_y)
 print np.median(all_x)
 print np.median(all_y)
 
-actual_width = int(cap.get(3))
-actual_height = int(cap.get(4))
 
-width = 2*int(np.median(all_x))
-height = 2*int(np.median(all_y))
+
+width = 2*int(np.mean(all_x))
+height = 2*int(np.mean(all_y))
 
 diff_width = actual_width - width
 diff_height = actual_height - height
@@ -258,10 +276,11 @@ frame2 = frame2[0:height,0:width]
 cv2.imwrite("gray_test.png",cv_rect_obj)
 #hsv = cv2.cvtColor(cv_rect_obj,cv2.COLOR_BGR2HSV)
 imgray = cv2.blur(cv_rect_obj,(15,15))
-thresh = cv2.inRange(imgray,np.array((80, 80, 80)), np.array((130, 130, 130)))
+thresh = cv2.inRange(imgray,np.array((110,110,110)), np.array((300, 300, 300)))
+
 cv2.imwrite("gray_test3.png",thresh)
 element = cv2.getStructuringElement(cv2.MORPH_ELLIPSE ,(3,3))
-cv2.erode(thresh,element,thresh,None,1)
+cv2.erode(thresh,element,thresh,None,10)
 cv2.dilate(thresh,element,thresh,None,10)
 contours,hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 #cv2.drawContours(cv_rect_obj,contours,-1,cv.CV_RGB(255,255,0),1)
@@ -277,8 +296,11 @@ frame2 = frame2[y_in:y_in+h_in,x_in:w_in+x_in]
 #cv2.imshow('thresh_first',thresh)
 #element = cv2.getStructuringElement(cv2.MORPH_ELLIPSE ,(3,3))
 imgray = cv2.blur(cv_rect_obj,(15,15))
-imgray = cv2.cvtColor(imgray,cv2.COLOR_BGR2GRAY)
-ret,thresh = cv2.threshold(imgray,170,200,0)
+#imgray = cv2.cvtColor(imgray,cv2.COLOR_BGR2GRAY)
+#ret,thresh = cv2.threshold(imgray,170,200,0)
+thresh = cv2.inRange(imgray,np.array((110,110,110)), np.array((300, 300, 300)))
+cv2.erode(thresh,element,thresh,None,6)
+cv2.dilate(thresh,element,thresh,None,10)
 cv2.imwrite("gray_tra2.png",thresh)
 cv2.imshow('thresh',thresh)
 contours,hierarchy = cv2.findContours(thresh,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
@@ -291,30 +313,15 @@ for cnt in contours:
         num_p = num_p + 1
         x = point[0][0]
         y = point[0][1]
-        if x > 20 and x < 640 and y > 20 and y < 460:
+        if x > (w_in/2)-(w_in/2)*0.7 and x<(w_in/2)+(w_in/2)*0.7 and y > (h_in/2)-(h_in/2)*0.7 and y < (h_in/2)+(h_in/2)*0.7 : # and y > 20 and y < 460:
             all_x.append(x)
             all_y.append(y)
 
 width = int(np.median(all_x))
-height = 2*int(np.median(all_y))
+height = h_in
 
-def draw_rect(pic,height,width,percentage):
-    w = int(width*percentage)
-    x = int((width-width*percentage)/2)
-    h = int(height*percentage)
-    y = int((height-height*percentage)/2)
-    cv2.rectangle(pic,(x,y),(x+w,y+h),(0,255,0),1)
-    return
 
-per75_point1 = [int(width-width*0.7)/2,int((height-height*0.7)/2)]
-per75_point2 = [int(width-width*0.7/2+width*0.7),int((height-height*0.7)/2+height*0.7)]
-per50_point1 = [int(width-width*0.45)/2,int((height-height*0.45)/2)]
-per50_point2 = [int(width-width*0.45/2+width*0.45),int((height-height*0.45)/2+height*0.45)]
-per25_point1 = [int(width-width*0.2)/2,int((height-height*0.2)/2)]
-print "points"
-print per25_point1
-per25_point2 = [int(width-width*0.2/2+width*0.2),int((height-height*0.2)/2+height*0.2)]
-print per25_point2
+
 
 cv_rect_obj1 = cv_rect_obj[0:height,0:width]
 #draw_rect(cv_rect_obj1,height,width,0.7)
@@ -329,13 +336,6 @@ cv_rect_obj2 = cv_rect_obj[0:height,width:width*2]
 
 
 
-def comp_tuple(mp,pt1,pt2):
-    return mp[0] >= pt1[0] and mp[0] <= pt2[0] and mp[1] >= pt1[1] and mp[1] <= pt2[1]
-
-def dist(pt1,pt2):
-    xd = pt2[0] - pt1[0]
-    yd = pt2[1] - pt1[1]
-    return math.sqrt(xd*xd + yd*yd)
 
 #half_width = int(width/2)
 #half_height = int(height/2)
@@ -348,7 +348,7 @@ def dist(pt1,pt2):
 #perc_25_height = int((height-height*0.15)/2)
 
 bout_threshold = 11
-dist_threshold = 3
+dist_threshold = 6
 conversion_pixel_to_cm = 10
 
 ## Points for heatmap
@@ -359,10 +359,10 @@ mid_points = []
 x_right = []
 y_right = []
 
-upper_left_25=upper_left_50=upper_left_75=upper_left=dist_upper_left_25=dist_upper_left_50=dist_upper_left_75=dist_upper_left=left_known_point=upper_left_num_bout=upper_left_frame_bout=upper_left_distance_bout=left_counter = 0
-upper_left_lap_bout = []
-upper_right_25=upper_right_50=upper_right_75=upper_right=dist_upper_right_25=dist_upper_right_50=dist_upper_right_75=dist_upper_right=right_known_point=upper_right_num_bout=upper_right_frame_bout=upper_right_distance_bout=right_counter = 0
-upper_right_lap_bout = []
+#upper_left_25=upper_left_50=upper_left_75=upper_left=dist_upper_left_25=dist_upper_left_50=dist_upper_left_75=dist_upper_left=left_known_point=upper_left_num_bout=upper_left_frame_bout=upper_left_distance_bout=left_counter = 0
+#upper_left_lap_bout = []
+#upper_right_25=upper_right_50=upper_right_75=upper_right=dist_upper_right_25=dist_upper_right_50=dist_upper_right_75=dist_upper_right=right_known_point=upper_right_num_bout=upper_right_frame_bout=upper_right_distance_bout=right_counter = 0
+#upper_right_lap_bout = []
 
 
 frame_number = cap.get(CV_CAP_PROP_POS_FRAMES)
@@ -371,7 +371,24 @@ time_in_msec = 0
 left_known_point = right_known_point = [0,0]
 
 left_object = ExperimentMetrics()
-right_object =ExperimentMetrics()
+right_object = ExperimentMetrics()
+
+width_l = width
+width_r = w_in - width
+
+left_object.per75_point1 = [int(width_l-width_l*0.7)/2,int((height-height*0.7)/2)]
+left_object.per75_point2 = [int((width_l-width_l*0.7)/2+width_l*0.7),int((height-height*0.7)/2+height*0.7)]
+left_object.per50_point1 = [int(width_l-width_l*0.45)/2,int((height-height*0.45)/2)]
+left_object.per50_point2 = [int((width_l-width_l*0.45)/2+width_l*0.45),int((height-height*0.45)/2+height*0.45)]
+left_object.per25_point1 = [int(width_l-width_l*0.2)/2,int((height-height*0.2)/2)]
+left_object.per25_point2 = [int((width_l-width_l*0.2)/2+width_l*0.2),int((height-height*0.2)/2+height*0.2)]
+right_object.per75_point1 = [int(width_r-width_r*0.7)/2,int((height-height*0.7)/2)]
+right_object.per75_point2 = [int((width_r-width_r*0.7)/2+width_r*0.7),int((height-height*0.7)/2+height*0.7)]
+right_object.per50_point1 = [int(width_r-width_r*0.45)/2,int((height-height*0.45)/2)]
+right_object.per50_point2 = [int((width_r-width_r*0.45)/2+width_r*0.45),int((height-height*0.45)/2+height*0.45)]
+right_object.per25_point1 = [int(width_r-width_r*0.2)/2,int((height-height*0.2)/2)]
+right_object.per25_point2 = [int((width_r-width_r*0.2)/2+width_r*0.2),int((height-height*0.2)/2+height*0.2)]
+
 
 while(frame_number < total_number_of_frames):
 #while(frame_number < 250):
@@ -397,18 +414,12 @@ while(frame_number < total_number_of_frames):
 
     left_side = frame[0:height,0:width]
     right_side = frame[0:height,width:width*2]
-    upper_left_25 = upper_left_25 +1
-    analyze(left_side,"left",cv_rect_obj1,x_left,y_left,upper_left_25,upper_left_50,
-        upper_left_75,upper_left,dist_upper_left_25,dist_upper_left_50,dist_upper_left_75,
-        dist_upper_left,left_known_point,upper_left_num_bout,upper_left_frame_bout,
-        upper_left_distance_bout,upper_left_lap_bout,left_counter,left_object)
+    #upper_left_25 = upper_left_25 +1
+    analyze(left_side,"left",cv_rect_obj1,x_left,y_left,left_object,width_l)
     #print left_object.square_50
-    analyze(right_side,"right",cv_rect_obj2,x_right,y_right,upper_right_25,upper_right_50,
-        upper_right_75,upper_right,dist_upper_right_25,dist_upper_right_50,dist_upper_right_75,
-        dist_upper_right,right_known_point,upper_right_num_bout,upper_right_frame_bout,
-        upper_right_distance_bout,upper_right_lap_bout,right_counter,right_object)
+    analyze(right_side,"right",cv_rect_obj2,x_right,y_right,right_object,width_r)
     #print right_object.square_50
-    if cv2.waitKey(33) == 27:
+    if cv2.waitKey(1) == 27:
         break
 
     frame_number = int(frame_number+5)
@@ -442,6 +453,12 @@ w_sheet = wb.get_sheet(0)
 w_sheet.write(r_sheet.nrows+1,0,"Results for " + sample_name)
 ### UPPER LEFT
 w_sheet.write(r_sheet.nrows+2,0,"Left")
+# FIXTIME:
+left_object.square_100 = left_object.square_100 * 5
+left_object.square_75 = left_object.square_75 * 5
+left_object.square_50 = left_object.square_50 * 5
+left_object.square_25 = left_object.square_25 * 5
+
 # TIME
 w_sheet.write(r_sheet.nrows+2,1,(left_object.square_100    / frame_per_sec))
 w_sheet.write(r_sheet.nrows+2,2,(left_object.square_75 / frame_per_sec))
@@ -468,13 +485,19 @@ w_sheet.write(r_sheet.nrows+2,11,(speed_upper_left_50))
 w_sheet.write(r_sheet.nrows+2,12,(speed_upper_left_25))
 # BOUTS
 w_sheet.write(r_sheet.nrows+2,13,(left_object.square_num_bout))
-w_sheet.write(r_sheet.nrows+2,14,(left_object.square_frame_bout / frame_per_sec))
+w_sheet.write(r_sheet.nrows+2,14,(left_object.square_frame_bout*5 / frame_per_sec))
 w_sheet.write(r_sheet.nrows+2,15,(left_object.square_distance_bout/conversion_pixel_to_cm))
 for i,f in enumerate(left_object.square_lap_bout):
-    w_sheet.write(r_sheet.nrows+2,i+16,f)
+    w_sheet.write(r_sheet.nrows+2,i+16,f*5/ frame_per_sec)
 
 ### UPPER RIGHT
 w_sheet.write(r_sheet.nrows+3,0,"Right")
+# FIXTIME:
+right_object.square_100 = right_object.square_100 * 5
+right_object.square_75 = right_object.square_75 * 5
+right_object.square_50 = right_object.square_50 * 5
+right_object.square_25 = right_object.square_25 * 5
+
 # TIME
 w_sheet.write(r_sheet.nrows+3,1,(right_object.square_100    / frame_per_sec))
 w_sheet.write(r_sheet.nrows+3,2,(right_object.square_75 / frame_per_sec))
@@ -501,10 +524,10 @@ w_sheet.write(r_sheet.nrows+3,11,(speed_upper_right_50))
 w_sheet.write(r_sheet.nrows+3,12,(speed_upper_right_25))
 # BOUTS
 w_sheet.write(r_sheet.nrows+3,13,(right_object.square_num_bout))
-w_sheet.write(r_sheet.nrows+3,14,(right_object.square_frame_bout / frame_per_sec))
+w_sheet.write(r_sheet.nrows+3,14,(right_object.square_frame_bout*5 / frame_per_sec))
 w_sheet.write(r_sheet.nrows+3,15,(right_object.square_distance_bout/conversion_pixel_to_cm))
 for i,f in enumerate(right_object.square_lap_bout):
-    w_sheet.write(r_sheet.nrows+3,i+16,f)
+    w_sheet.write(r_sheet.nrows+3,i+16,f*5/ frame_per_sec)
 
 
 wb.save(results_excel)
