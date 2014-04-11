@@ -44,7 +44,7 @@ class ExperimentMetrics(object):
 #upper_right_lap_bout = []
 
 if len(sys.argv) != 4:
-    sys.stderr.write("usage: python test.py video_file results.xls dark/bright\n")
+    sys.stderr.write("usage: python test.py video_file results.xls dark/bright/medium\n")
     sys.exit()
 # create video capture
 #cap = cv2.VideoCapture("/Users/hayer/Desktop/Anand/openfields/100611_openfield-b5.m4v")
@@ -98,7 +98,9 @@ def analyze(frame,frame_name,frame2,x,y,exp_obj,width):
     # convert to hsv and find range of colors
     hsv = frame3 #cv2.cvtColor(frame3,cv2.COLOR_BGR2HSV)
     if brightness == "bright":
-        thresh = cv2.inRange(hsv,np.array((1, 1, 1)), np.array((150, 150, 150)))
+        thresh = cv2.inRange(hsv,np.array((1, 1, 1)), np.array((110, 110, 110)))
+    elif brightness == "medium":
+        thresh = cv2.inRange(hsv,np.array((1, 1, 1)), np.array((90, 90, 90)))
     else:
         thresh = cv2.inRange(hsv,np.array((0, 0, 1)), np.array((0, 0, 15)))
 
@@ -243,13 +245,17 @@ def analyze(frame,frame_name,frame2,x,y,exp_obj,width):
     cv2.imshow('%sframe' % (frame_name),frame)
     return
 
-cap.set(CV_CAP_PROP_POS_FRAMES,500)
+cap.set(CV_CAP_PROP_POS_FRAMES,int(frame_per_sec*30))
 _,frame2 = cap.read()
 imgray = cv2.blur(frame2,(15,15))
 #imgray = cv2.cvtColor(imgray,cv2.COLOR_BGR2GRAY)
 if brightness == "bright":
     #thresh = cv2.inRange(imgray,np.array((200)), np.array((300)))
-    thresh = cv2.inRange(imgray,np.array((250,250,250)), np.array((300, 300, 300)))
+    #thresh = cv2.inRange(imgray,np.array((250,250,250)), np.array((300, 300, 300)))
+    thresh = cv2.inRange(imgray,np.array((210,210,210)), np.array((300, 300, 300)))
+elif brightness == "medium":
+    #thresh = cv2.inRange(imgray,np.array((200,200,200)), np.array((250,250,250)))
+    thresh = cv2.inRange(imgray,np.array((180,180,180)), np.array((250,250,250)))
 else:
     thresh = cv2.inRange(imgray,np.array((100,100,100)), np.array((160, 160, 160)))
 #element = cv2.getStructuringElement(cv2.MORPH_ELLIPSE ,(5,5))
@@ -273,7 +279,11 @@ while not contours:
     if brightness == "bright":
         #thresh = cv2.inRange(hsv,np.array((0, 0, 1)), np.array((0, 0, 15)))
         #thresh = cv2.inRange(imgray,np.array((200)), np.array((300)))
-        thresh = cv2.inRange(imgray,np.array((250,250,250)), np.array((300, 300, 300)))
+        #thresh = cv2.inRange(imgray,np.array((250,250,250)), np.array((300, 300, 300)))
+        thresh = cv2.inRange(imgray,np.array((210,210,210)), np.array((300, 300, 300)))
+    elif brightness == "medium":
+        #thresh = cv2.inRange(imgray,np.array((200,200,200)), np.array((250,250,250)))
+        thresh = cv2.inRange(imgray,np.array((180,180,180)), np.array((250,250,250)))
     else:
         thresh = cv2.inRange(imgray,np.array((100,100,100)), np.array((160, 160, 160)))
     #thresh = cv2.inRange(imgray,np.array((110,110,110)), np.array((300, 300, 300)))
@@ -313,7 +323,10 @@ frame2 = frame2[0:height,0:width]
 cv2.imwrite("gray_test.png",cv_rect_obj)
 imgray = cv2.blur(cv_rect_obj,(15,15))
 if brightness == "bright":
-    thresh = cv2.inRange(imgray,np.array((250,250,250)), np.array((300,300, 300)))
+    thresh = cv2.inRange(imgray,np.array((210,210,210)), np.array((300, 300, 300)))
+elif brightness == "medium":
+    #thresh = cv2.inRange(imgray,np.array((200,200,200)), np.array((250,250,250)))
+    thresh = cv2.inRange(imgray,np.array((180,180,180)), np.array((250,250,250)))
 else:
     thresh = cv2.inRange(imgray,np.array((100,100,100)), np.array((160, 160, 160)))
 #thresh = cv2.inRange(imgray,np.array((110,110,110)), np.array((300, 300, 300)))
@@ -340,7 +353,10 @@ imgray = cv2.blur(cv_rect_obj,(15,15))
 #ret,thresh = cv2.threshold(imgray,170,200,0)
 if brightness == "bright":
     #thresh = cv2.inRange(imgray,np.array((200)), np.array((300)))
-    thresh = cv2.inRange(imgray,np.array((250,250,250)), np.array((300, 300, 300)))
+    thresh = cv2.inRange(imgray,np.array((210,210,210)), np.array((300, 300, 300)))
+elif brightness == "medium":
+    #thresh = cv2.inRange(imgray,np.array((200,200,200)), np.array((250,250,250)))
+    thresh = cv2.inRange(imgray,np.array((180,180,180)), np.array((250,250,250)))
 else:
     thresh = cv2.inRange(imgray,np.array((100,100,100)), np.array((160, 160, 160)))
 #thresh = cv2.inRange(imgray,np.array((110,110,110)), np.array((300, 300, 300)))
@@ -395,8 +411,8 @@ cv_rect_obj2 = cv_rect_obj[0:height,width:width*2]
 #perc_25_width = int((half_width-half_width*0.15)/2)
 #perc_25_height = int((height-height*0.15)/2)
 
-bout_threshold = 3*increaser
-dist_threshold = 6
+bout_threshold = 8
+dist_threshold = 8
 conversion_pixel_to_cm = 15
 
 ## Points for heatmap
@@ -502,6 +518,11 @@ w_sheet = wb.get_sheet(0)
 
 
 w_sheet.write(r_sheet.nrows+1,0,"Results for " + sample_name)
+# Video information
+w_sheet.write(r_sheet.nrows+1,5,"total_number_of_frames: ")
+w_sheet.write(r_sheet.nrows+1,6,total_number_of_frames)
+w_sheet.write(r_sheet.nrows+1,7,"Frames per second: ")
+w_sheet.write(r_sheet.nrows+1,8,frame_per_sec)
 ### UPPER LEFT
 w_sheet.write(r_sheet.nrows+2,0,"Left")
 # FIXTIME:
@@ -539,7 +560,7 @@ w_sheet.write(r_sheet.nrows+2,13,(left_object.square_num_bout))
 w_sheet.write(r_sheet.nrows+2,14,(left_object.square_frame_bout*increaser / frame_per_sec))
 w_sheet.write(r_sheet.nrows+2,15,(left_object.square_distance_bout/conversion_pixel_to_cm))
 for i,f in enumerate(left_object.square_lap_bout):
-    w_sheet.write(r_sheet.nrows+2,i+16,f*increaser)
+    w_sheet.write(r_sheet.nrows+2,i+16,f*increaser/ frame_per_sec)
 
 ### UPPER RIGHT
 w_sheet.write(r_sheet.nrows+3,0,"Right")
@@ -578,7 +599,9 @@ w_sheet.write(r_sheet.nrows+3,13,(right_object.square_num_bout))
 w_sheet.write(r_sheet.nrows+3,14,(right_object.square_frame_bout*increaser / frame_per_sec))
 w_sheet.write(r_sheet.nrows+3,15,(right_object.square_distance_bout/conversion_pixel_to_cm))
 for i,f in enumerate(right_object.square_lap_bout):
-    w_sheet.write(r_sheet.nrows+3,i+16,f*increaser)
+    w_sheet.write(r_sheet.nrows+3,i+16,f*increaser/ frame_per_sec)
+
+
 
 
 wb.save(results_excel)
