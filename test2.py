@@ -255,7 +255,7 @@ if brightness == "bright":
     thresh = cv2.inRange(imgray,np.array((210,210,210)), np.array((300, 300, 300)))
 elif brightness == "medium":
     #thresh = cv2.inRange(imgray,np.array((200,200,200)), np.array((250,250,250)))
-    thresh = cv2.inRange(imgray,np.array((180,180,180)), np.array((250,250,250)))
+    thresh = cv2.inRange(imgray,np.array([180,180,180]), np.array([250,250,250]))
 else:
     thresh = cv2.inRange(imgray,np.array((100,100,100)), np.array((160, 160, 160)))
 #element = cv2.getStructuringElement(cv2.MORPH_ELLIPSE ,(5,5))
