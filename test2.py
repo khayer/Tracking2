@@ -98,11 +98,14 @@ def analyze(frame,frame_name,frame2,x,y,exp_obj,width):
     # convert to hsv and find range of colors
     hsv = frame3 #cv2.cvtColor(frame3,cv2.COLOR_BGR2HSV)
     if brightness == "bright":
-        thresh = cv2.inRange(hsv,np.array((1, 1, 1)), np.array((110, 110, 110)))
-    elif brightness == "medium":
         thresh = cv2.inRange(hsv,np.array((1, 1, 1)), np.array((90, 90, 90)))
+    elif brightness == "medium":
+        #thresh = cv2.inRange(hsv,np.array((1, 1, 1)), np.array((90, 90, 90)))
+        thresh = cv2.inRange(hsv,np.array((1,1, 1)), np.array((60, 60, 60)))
+    elif brightness == "brighter":
+        thresh = cv2.inRange(hsv,np.array((1, 1, 1)), np.array((150, 150, 150)))
     else:
-        thresh = cv2.inRange(hsv,np.array((0, 0, 1)), np.array((0, 0, 15)))
+        thresh = cv2.inRange(hsv,np.array((1,1, 1)), np.array((20, 20, 20)))
 
     #res = cv2.morphologyEx(thresh,cv2.MORPH_OPEN,element)
     #cv2.imshow('thresh_first2',res)
@@ -255,9 +258,14 @@ if brightness == "bright":
     thresh = cv2.inRange(imgray,np.array((210,210,210)), np.array((300, 300, 300)))
 elif brightness == "medium":
     #thresh = cv2.inRange(imgray,np.array((200,200,200)), np.array((250,250,250)))
-    thresh = cv2.inRange(imgray,np.array([180,180,180]), np.array([250,250,250]))
+    thresh = cv2.inRange(imgray,np.array((180,180,180)), np.array((250,250,250)))
+elif brightness == "mediumlow":
+    thresh = cv2.inRange(imgray,np.array((160,160,160)), np.array((180,180,180)))
+elif brightness == "brighter":
+    thresh = cv2.inRange(imgray,np.array((250,250,250)), np.array((300, 300, 300)))
 else:
     thresh = cv2.inRange(imgray,np.array((100,100,100)), np.array((160, 160, 160)))
+    #thresh = cv2.inRange(imgray,np.array((150,150,150)), np.array((160, 160, 160)))
 #element = cv2.getStructuringElement(cv2.MORPH_ELLIPSE ,(5,5))
 #cv2.erode(thresh,element,thresh,None,6)
 #cv2.dilate(thresh,element,thresh,None,10)
@@ -284,6 +292,10 @@ while not contours:
     elif brightness == "medium":
         #thresh = cv2.inRange(imgray,np.array((200,200,200)), np.array((250,250,250)))
         thresh = cv2.inRange(imgray,np.array((180,180,180)), np.array((250,250,250)))
+    elif brightness == "mediumlow":
+        thresh = cv2.inRange(imgray,np.array((160,160,160)), np.array((180,180,180)))
+    elif brightness == "brighter":
+        thresh = cv2.inRange(imgray,np.array((250,250,250)), np.array((300, 300, 300)))
     else:
         thresh = cv2.inRange(imgray,np.array((100,100,100)), np.array((160, 160, 160)))
     #thresh = cv2.inRange(imgray,np.array((110,110,110)), np.array((300, 300, 300)))
@@ -327,6 +339,10 @@ if brightness == "bright":
 elif brightness == "medium":
     #thresh = cv2.inRange(imgray,np.array((200,200,200)), np.array((250,250,250)))
     thresh = cv2.inRange(imgray,np.array((180,180,180)), np.array((250,250,250)))
+elif brightness == "mediumlow":
+    thresh = cv2.inRange(imgray,np.array((160,160,160)), np.array((180,180,180)))
+elif brightness == "brighter":
+    thresh = cv2.inRange(imgray,np.array((250,250,250)), np.array((300, 300, 300)))
 else:
     thresh = cv2.inRange(imgray,np.array((100,100,100)), np.array((160, 160, 160)))
 #thresh = cv2.inRange(imgray,np.array((110,110,110)), np.array((300, 300, 300)))
@@ -357,6 +373,10 @@ if brightness == "bright":
 elif brightness == "medium":
     #thresh = cv2.inRange(imgray,np.array((200,200,200)), np.array((250,250,250)))
     thresh = cv2.inRange(imgray,np.array((180,180,180)), np.array((250,250,250)))
+elif brightness == "mediumlow":
+    thresh = cv2.inRange(imgray,np.array((160,160,160)), np.array((180,180,180)))
+elif brightness == "brighter":
+    thresh = cv2.inRange(imgray,np.array((250,250,250)), np.array((300, 300, 300)))
 else:
     thresh = cv2.inRange(imgray,np.array((100,100,100)), np.array((160, 160, 160)))
 #thresh = cv2.inRange(imgray,np.array((110,110,110)), np.array((300, 300, 300)))
