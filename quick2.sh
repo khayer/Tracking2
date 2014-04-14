@@ -1,0 +1,12 @@
+python test2.py ~/Desktop/for_kat/1124-b4_14_openfield.mov ~/Desktop/test_ZEROMAZE.xls mediumlow
+python test2.py ~/Desktop/for_kat/1124-b4_23_openfield.mov ~/Desktop/test_ZEROMAZE.xls mediumlow
+python test2.py ~/Desktop/for_kat/1121-B1-14_openfield.mov ~/Desktop/test_ZEROMAZE.xls mediumlow
+python test2.py ~/Desktop/for_kat/1121-b1-23_openfield.mov ~/Desktop/test_ZEROMAZE.xls mediumlow
+ python test2.py ~/Desktop/for_kat/1122-b2_14_openfield.mov ~/Desktop/test_ZEROMAZE.xls mediumlow
+python test2.py ~/Desktop/for_kat/1122-b2_23_openfield.mov ~/Desktop/test_ZEROMAZE.xls mediumlow
+python test2.py ~/Desktop/for_kat/1123-b3_14_openfield.mov ~/Desktop/test_ZEROMAZE.xls mediumlow
+python test2.py ~/Desktop/for_kat/1123-b3_23_openfield.mov ~/Desktop/test_ZEROMAZE.xls mediumlow
+python test2.py ~/Desktop/for_kat/1201-b1-1_4-openfield.mov ~/Desktop/test_ZEROMAZE.xls brighter
+python test2.py ~/Desktop/for_kat/1201-b1-3_4-openfield.mov ~/Desktop/test_ZEROMAZE.xls brighter
+python test2.py ~/Desktop/for_kat/1201-b2-6_7-openfield.mov ~/Desktop/test_ZEROMAZE.xls medium
+python test2.py ~/Desktop/for_kat/1202-b3-14_15-openfield.mov ~/Desktop/test_ZEROMAZE.xls bright

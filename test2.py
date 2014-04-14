@@ -102,6 +102,9 @@ def analyze(frame,frame_name,frame2,x,y,exp_obj,width):
     elif brightness == "medium":
         #thresh = cv2.inRange(hsv,np.array((1, 1, 1)), np.array((90, 90, 90)))
         thresh = cv2.inRange(hsv,np.array((1,1, 1)), np.array((60, 60, 60)))
+    elif brightness == "mediumlow":
+        #thresh = cv2.inRange(hsv,np.array((1, 1, 1)), np.array((90, 90, 90)))
+        thresh = cv2.inRange(hsv,np.array((1,1, 1)), np.array((10, 10, 10)))
     elif brightness == "brighter":
         thresh = cv2.inRange(hsv,np.array((1, 1, 1)), np.array((150, 150, 150)))
     else:
@@ -633,7 +636,7 @@ plt.clf()
 plt.imshow(heatmap, extent=extent)
 cb = plt.colorbar()
 cb.set_label('mean value')
-plt.savefig(sample_name + "right_heatmap.png")
+plt.savefig(sample_name + "_left_heatmap.png")
 
 
 
@@ -643,6 +646,6 @@ plt.clf()
 plt.imshow(heatmap, extent=extent)
 cb = plt.colorbar()
 cb.set_label('mean value')
-plt.savefig(sample_name + "left_heatmap.png")
+plt.savefig(sample_name + "_right_heatmap.png")
 
 
