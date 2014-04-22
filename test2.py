@@ -98,7 +98,7 @@ def analyze(frame,frame_name,frame2,x,y,exp_obj,width):
     # convert to hsv and find range of colors
     hsv = frame3 #cv2.cvtColor(frame3,cv2.COLOR_BGR2HSV)
     if brightness == "bright":
-        thresh = cv2.inRange(hsv,np.array((1, 1, 1)), np.array((90, 90, 90)))
+        thresh = cv2.inRange(hsv,np.array((1, 1, 1)), np.array((80, 80, 80)))
     elif brightness == "medium":
         #thresh = cv2.inRange(hsv,np.array((1, 1, 1)), np.array((90, 90, 90)))
         thresh = cv2.inRange(hsv,np.array((1,1, 1)), np.array((60, 60, 60)))
@@ -258,7 +258,7 @@ imgray = cv2.blur(frame2,(15,15))
 if brightness == "bright":
     #thresh = cv2.inRange(imgray,np.array((200)), np.array((300)))
     #thresh = cv2.inRange(imgray,np.array((250,250,250)), np.array((300, 300, 300)))
-    thresh = cv2.inRange(imgray,np.array((210,210,210)), np.array((300, 300, 300)))
+    thresh = cv2.inRange(imgray,np.array((180,180,180)), np.array((300, 300, 300)))
 elif brightness == "medium":
     #thresh = cv2.inRange(imgray,np.array((200,200,200)), np.array((250,250,250)))
     thresh = cv2.inRange(imgray,np.array((180,180,180)), np.array((250,250,250)))
@@ -291,7 +291,7 @@ while not contours:
         #thresh = cv2.inRange(hsv,np.array((0, 0, 1)), np.array((0, 0, 15)))
         #thresh = cv2.inRange(imgray,np.array((200)), np.array((300)))
         #thresh = cv2.inRange(imgray,np.array((250,250,250)), np.array((300, 300, 300)))
-        thresh = cv2.inRange(imgray,np.array((210,210,210)), np.array((300, 300, 300)))
+        thresh = cv2.inRange(imgray,np.array((180,180,180)), np.array((300, 300, 300)))
     elif brightness == "medium":
         #thresh = cv2.inRange(imgray,np.array((200,200,200)), np.array((250,250,250)))
         thresh = cv2.inRange(imgray,np.array((180,180,180)), np.array((250,250,250)))
@@ -338,7 +338,7 @@ frame2 = frame2[0:height,0:width]
 cv2.imwrite("gray_test.png",cv_rect_obj)
 imgray = cv2.blur(cv_rect_obj,(15,15))
 if brightness == "bright":
-    thresh = cv2.inRange(imgray,np.array((210,210,210)), np.array((300, 300, 300)))
+    thresh = cv2.inRange(imgray,np.array((180,180,180)), np.array((300, 300, 300)))
 elif brightness == "medium":
     #thresh = cv2.inRange(imgray,np.array((200,200,200)), np.array((250,250,250)))
     thresh = cv2.inRange(imgray,np.array((180,180,180)), np.array((250,250,250)))
@@ -351,9 +351,9 @@ else:
 #thresh = cv2.inRange(imgray,np.array((110,110,110)), np.array((300, 300, 300)))
 
 cv2.imwrite("gray_test3.png",thresh)
-#element = cv2.getStructuringElement(cv2.MORPH_ELLIPSE ,(3,3))
+element = cv2.getStructuringElement(cv2.MORPH_ELLIPSE ,(3,3))
 #cv2.erode(thresh,element,thresh,None,10)
-#cv2.dilate(thresh,element,thresh,None,10)
+cv2.dilate(thresh,element,thresh,None,10)
 contours,hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 #cv2.drawContours(cv_rect_obj,contours,-1,cv.CV_RGB(255,255,0),1)
 
@@ -372,7 +372,7 @@ imgray = cv2.blur(cv_rect_obj,(15,15))
 #ret,thresh = cv2.threshold(imgray,170,200,0)
 if brightness == "bright":
     #thresh = cv2.inRange(imgray,np.array((200)), np.array((300)))
-    thresh = cv2.inRange(imgray,np.array((210,210,210)), np.array((300, 300, 300)))
+    thresh = cv2.inRange(imgray,np.array((180,180,180)), np.array((300, 300, 300)))
 elif brightness == "medium":
     #thresh = cv2.inRange(imgray,np.array((200,200,200)), np.array((250,250,250)))
     thresh = cv2.inRange(imgray,np.array((180,180,180)), np.array((250,250,250)))
@@ -384,8 +384,8 @@ else:
     thresh = cv2.inRange(imgray,np.array((100,100,100)), np.array((160, 160, 160)))
 #thresh = cv2.inRange(imgray,np.array((110,110,110)), np.array((300, 300, 300)))
 element = cv2.getStructuringElement(cv2.MORPH_ELLIPSE ,(3,3))
-cv2.erode(thresh,element,thresh,None,6)
-cv2.dilate(thresh,element,thresh,None,6)
+#cv2.erode(thresh,element,thresh,None,6)
+#cv2.dilate(thresh,element,thresh,None,6)
 cv2.imwrite("gray_tra2.png",thresh)
 cv2.imshow('thresh',thresh)
 contours,hierarchy = cv2.findContours(thresh,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
