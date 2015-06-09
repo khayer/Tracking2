@@ -1,0 +1,4 @@
+python test2.py /Users/hayer/Documents/sarah_videos/2014-07-02-SOR-group2/2014-07-02-SOR-Group2-trainingday-box1_2-groupA.OF.mov  /Users/hayer/Documents/sarah_videos/OpenFieldResults/OF_results_final.xls dark2.3
+python test2.py /Users/hayer/Documents/sarah_videos/2014-07-02-SOR-group2/2014-07-02-SOR-Group2-trainingday-box1_2-groupB.OF.mov  /Users/hayer/Documents/sarah_videos/OpenFieldResults/OF_results_final.xls dark2.3
+python test2.py /Users/hayer/Documents/sarah_videos/2014-07-02-SOR-group2/2014-07-02-SOR-group2-trainingday-box3_4-groupA.OF.mov  /Users/hayer/Documents/sarah_videos/OpenFieldResults/OF_results_final.xls dark2.4
+python test2.py /Users/hayer/Documents/sarah_videos/2014-07-02-SOR-group2/2014-07-02-SOR-group2-trainingday-box3_4-groupB.OF.mov  /Users/hayer/Documents/sarah_videos/OpenFieldResults/OF_results_final.xls dark2.2

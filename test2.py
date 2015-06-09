@@ -71,9 +71,38 @@ print "Frame per sec"
 print frame_per_sec
 increaser = int(frame_per_sec/5)
 
-def draw_rect(pic,height,width,percentage):
-    w = int(width*percentage)
-    x = int((width-width*percentage)/2)
+def get_threshold(imgray,brightness):
+    if brightness == "bright":
+        #thresh = cv2.inRange(imgray,np.array((200)), np.array((300)))
+        thresh = cv2.inRange(imgray,np.array((180,180,180)), np.array((300, 300, 300)))
+    elif brightness == "medium":
+        #thresh = cv2.inRange(imgray,np.array((200,200,200)), np.array((250,250,250)))
+        thresh = cv2.inRange(imgray,np.array((180,180,180)), np.array((250,250,250)))
+    elif brightness == "mediumlow":
+        thresh = cv2.inRange(imgray,np.array((160,160,160)), np.array((180,180,180)))
+    elif brightness == "brighter":
+        thresh = cv2.inRange(imgray,np.array((250,250,250)), np.array((300, 300, 300)))
+    elif brightness == "dark":
+        thresh = cv2.inRange(imgray,np.array((90,90,90)), np.array((110, 110, 110)))
+    elif brightness == "dark2":
+        thresh = cv2.inRange(imgray,np.array((120, 120, 120)), np.array((160,160,160)))
+    elif brightness == "dark2.2":
+        thresh = cv2.inRange(imgray,np.array((130, 130, 130)), np.array((170,170,170)))
+    elif brightness == "dark2.3":
+        thresh = cv2.inRange(imgray,np.array((130, 130, 130)), np.array((180,180,180)))
+    elif brightness == "dark2.4":
+        thresh = cv2.inRange(imgray,np.array((125, 125, 125)), np.array((180,180,180)))
+    elif brightness == "dark3":
+        thresh = cv2.inRange(imgray,np.array((150,150,150)), np.array((180,180,180)))
+    elif brightness == "dark4":
+        thresh = cv2.inRange(imgray,np.array((157,157,157)), np.array((220,220,220)))
+    else:
+        thresh = cv2.inRange(imgray,np.array((100,100,100)), np.array((160, 160, 160)))
+    return thresh
+
+def draw_rect(pic,height,width,percentage,adjust=0):
+    w = int((width)*percentage)
+    x = adjust+int((width-width*percentage)/2)
     h = int(height*percentage)
     y = int((height-height*percentage)/2)
     cv2.rectangle(pic,(x,y),(x+w,y+h),(0,255,0),1)
@@ -107,8 +136,20 @@ def analyze(frame,frame_name,frame2,x,y,exp_obj,width):
         thresh = cv2.inRange(hsv,np.array((1,1, 1)), np.array((10, 10, 10)))
     elif brightness == "brighter":
         thresh = cv2.inRange(hsv,np.array((1, 1, 1)), np.array((150, 150, 150)))
+    elif brightness == "dark":
+        thresh = cv2.inRange(hsv,np.array((5,5, 5)), np.array((10, 10, 10)))
+    elif brightness == "dark2":
+        thresh = cv2.inRange(hsv,np.array((1,1, 1)), np.array((10, 10, 10)))
+    elif brightness == "dark2.2":
+        thresh = cv2.inRange(hsv,np.array((2,2, 2)), np.array((20, 20, 20)))
+    elif brightness == "dark2.3":
+        thresh = cv2.inRange(hsv,np.array((4,4,4)), np.array((20, 20, 20)))
+    elif brightness == "dark3":
+        thresh = cv2.inRange(hsv,np.array((0,0, 0)), np.array((10, 10, 10)))
+    elif brightness == "dark4":
+        thresh = cv2.inRange(hsv,np.array((0,0, 0)), np.array((5, 5, 5)))
     else:
-        thresh = cv2.inRange(hsv,np.array((1,1, 1)), np.array((20, 20, 20)))
+        thresh = cv2.inRange(hsv,np.array((0,0, 0)), np.array((15, 15, 15)))
 
     #res = cv2.morphologyEx(thresh,cv2.MORPH_OPEN,element)
     #cv2.imshow('thresh_first2',res)
@@ -255,24 +296,13 @@ cap.set(CV_CAP_PROP_POS_FRAMES,int(frame_per_sec*30))
 _,frame2 = cap.read()
 imgray = cv2.blur(frame2,(15,15))
 #imgray = cv2.cvtColor(imgray,cv2.COLOR_BGR2GRAY)
-if brightness == "bright":
-    #thresh = cv2.inRange(imgray,np.array((200)), np.array((300)))
-    #thresh = cv2.inRange(imgray,np.array((250,250,250)), np.array((300, 300, 300)))
-    thresh = cv2.inRange(imgray,np.array((180,180,180)), np.array((300, 300, 300)))
-elif brightness == "medium":
-    #thresh = cv2.inRange(imgray,np.array((200,200,200)), np.array((250,250,250)))
-    thresh = cv2.inRange(imgray,np.array((180,180,180)), np.array((250,250,250)))
-elif brightness == "mediumlow":
-    thresh = cv2.inRange(imgray,np.array((160,160,160)), np.array((180,180,180)))
-elif brightness == "brighter":
-    thresh = cv2.inRange(imgray,np.array((250,250,250)), np.array((300, 300, 300)))
-else:
-    thresh = cv2.inRange(imgray,np.array((100,100,100)), np.array((160, 160, 160)))
+
+thresh = get_threshold(imgray,brightness)
     #thresh = cv2.inRange(imgray,np.array((150,150,150)), np.array((160, 160, 160)))
 #element = cv2.getStructuringElement(cv2.MORPH_ELLIPSE ,(5,5))
 #cv2.erode(thresh,element,thresh,None,6)
 #cv2.dilate(thresh,element,thresh,None,10)
-cv2.imwrite("gray_tra.png",thresh)
+cv2.imwrite("gray_tra1.png",thresh)
 
 cv2.imshow('thresh',thresh)
 contours,hierarchy = cv2.findContours(thresh,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
@@ -281,26 +311,18 @@ all_x = []
 all_y = []
 actual_width = int(cap.get(3))
 actual_height = int(cap.get(4))
+print "Actual height"
+print actual_height
+print "actual_width"
+print actual_width
 while not contours:
     _,frame2 = cap.read()
     cv2.imshow('frame2',frame2)
 
     imgray = cv2.blur(frame2,(15,15))
     #imgray = cv2.cvtColor(imgray,cv2.COLOR_BGR2HSV)
-    if brightness == "bright":
-        #thresh = cv2.inRange(hsv,np.array((0, 0, 1)), np.array((0, 0, 15)))
-        #thresh = cv2.inRange(imgray,np.array((200)), np.array((300)))
-        #thresh = cv2.inRange(imgray,np.array((250,250,250)), np.array((300, 300, 300)))
-        thresh = cv2.inRange(imgray,np.array((180,180,180)), np.array((300, 300, 300)))
-    elif brightness == "medium":
-        #thresh = cv2.inRange(imgray,np.array((200,200,200)), np.array((250,250,250)))
-        thresh = cv2.inRange(imgray,np.array((180,180,180)), np.array((250,250,250)))
-    elif brightness == "mediumlow":
-        thresh = cv2.inRange(imgray,np.array((160,160,160)), np.array((180,180,180)))
-    elif brightness == "brighter":
-        thresh = cv2.inRange(imgray,np.array((250,250,250)), np.array((300, 300, 300)))
-    else:
-        thresh = cv2.inRange(imgray,np.array((100,100,100)), np.array((160, 160, 160)))
+
+    thresh = get_threshold(imgray,brightness)
     #thresh = cv2.inRange(imgray,np.array((110,110,110)), np.array((300, 300, 300)))
     #imgray = cv2.cvtColor(imgray,cv2.COLOR_BGR2GRAY)
     #cv2.imshow('imgray',imgray)
@@ -320,8 +342,10 @@ for cnt in contours:
             all_y.append(y)
 print (all_x)
 print (all_y)
-print np.median(all_x)
-print np.median(all_y)
+print np.mean(all_x)
+print np.mean(all_y)
+
+
 
 
 
@@ -337,19 +361,8 @@ frame2 = frame2[0:height,0:width]
 #cv_rect_obj = cv2.cvtColor(cv_rect_obj,cv2.COLOR_BGR2GRAY)
 cv2.imwrite("gray_test.png",cv_rect_obj)
 imgray = cv2.blur(cv_rect_obj,(15,15))
-if brightness == "bright":
-    thresh = cv2.inRange(imgray,np.array((180,180,180)), np.array((300, 300, 300)))
-elif brightness == "medium":
-    #thresh = cv2.inRange(imgray,np.array((200,200,200)), np.array((250,250,250)))
-    thresh = cv2.inRange(imgray,np.array((180,180,180)), np.array((250,250,250)))
-elif brightness == "mediumlow":
-    thresh = cv2.inRange(imgray,np.array((160,160,160)), np.array((180,180,180)))
-elif brightness == "brighter":
-    thresh = cv2.inRange(imgray,np.array((250,250,250)), np.array((300, 300, 300)))
-else:
-    thresh = cv2.inRange(imgray,np.array((100,100,100)), np.array((160, 160, 160)))
-#thresh = cv2.inRange(imgray,np.array((110,110,110)), np.array((300, 300, 300)))
 
+thresh = get_threshold(imgray,brightness)
 cv2.imwrite("gray_test3.png",thresh)
 element = cv2.getStructuringElement(cv2.MORPH_ELLIPSE ,(3,3))
 #cv2.erode(thresh,element,thresh,None,10)
@@ -370,18 +383,8 @@ frame2 = frame2[y_in:y_in+h_in,x_in:w_in+x_in]
 imgray = cv2.blur(cv_rect_obj,(15,15))
 #imgray = cv2.cvtColor(imgray,cv2.COLOR_BGR2GRAY)
 #ret,thresh = cv2.threshold(imgray,170,200,0)
-if brightness == "bright":
-    #thresh = cv2.inRange(imgray,np.array((200)), np.array((300)))
-    thresh = cv2.inRange(imgray,np.array((180,180,180)), np.array((300, 300, 300)))
-elif brightness == "medium":
-    #thresh = cv2.inRange(imgray,np.array((200,200,200)), np.array((250,250,250)))
-    thresh = cv2.inRange(imgray,np.array((180,180,180)), np.array((250,250,250)))
-elif brightness == "mediumlow":
-    thresh = cv2.inRange(imgray,np.array((160,160,160)), np.array((180,180,180)))
-elif brightness == "brighter":
-    thresh = cv2.inRange(imgray,np.array((250,250,250)), np.array((300, 300, 300)))
-else:
-    thresh = cv2.inRange(imgray,np.array((100,100,100)), np.array((160, 160, 160)))
+
+tresh = get_threshold(imgray,brightness)
 #thresh = cv2.inRange(imgray,np.array((110,110,110)), np.array((300, 300, 300)))
 element = cv2.getStructuringElement(cv2.MORPH_ELLIPSE ,(3,3))
 #cv2.erode(thresh,element,thresh,None,6)
@@ -402,7 +405,7 @@ for cnt in contours:
             all_x.append(x)
             all_y.append(y)
 
-width = int(np.median(all_x))
+width = int(np.mean(all_x))
 height = h_in
 
 width = w_in/2
@@ -478,8 +481,11 @@ right_object.per25_point2 = [int((width_r-width_r*0.2)/2+width_r*0.2),int((heigh
 
 cap.set(CV_CAP_PROP_POS_FRAMES,0)
 frame_number = cap.get(CV_CAP_PROP_POS_FRAMES)
+
+
+
 while(frame_number < total_number_of_frames):
-#while(frame_number < 250):
+#while(frame_number < 450):
     #frame_number = cap.get(CV_CAP_PROP_POS_FRAMES)
     #CV_CAP_PROP_POS_MSEC
     #l = cap.get(CV_CAP_PROP_POS_MSEC)
@@ -513,8 +519,13 @@ while(frame_number < total_number_of_frames):
     frame_number = int(frame_number+increaser)
     #print left_object.square_lap_bout
     #print right_object.square_lap_bout
+draw_rect(frame2,height,width,0.7)
+draw_rect(frame2,height,width,0.45)
+draw_rect(frame2,height,width,0.2)
 
-
+draw_rect(frame2,height,width,0.7,width)
+draw_rect(frame2,height,width,0.45,width)
+draw_rect(frame2,height,width,0.2,width)
 cv2.imwrite(sample_name + "_tra.png",frame2)
 # Clean up everything before leaving
 cv2.destroyAllWindows()
@@ -630,22 +641,23 @@ for i,f in enumerate(right_object.square_lap_bout):
 wb.save(results_excel)
 
 ## Draw heatmap
-heatmap, xedges, yedges = np.histogram2d(y_left, x_left, bins=50)
-extent = [ yedges[0], yedges[-1], xedges[0], xedges[-1]]
-plt.clf()
-plt.imshow(heatmap, extent=extent)
-cb = plt.colorbar()
-cb.set_label('mean value')
-plt.savefig(sample_name + "_left_heatmap.png")
+if y_left and x_left:
+    heatmap, xedges, yedges = np.histogram2d(y_left, x_left, bins=50)
+    extent = [ yedges[0], yedges[-1], xedges[0], xedges[-1]]
+    plt.clf()
+    plt.imshow(heatmap, extent=extent)
+    cb = plt.colorbar()
+    cb.set_label('mean value')
+    plt.savefig(sample_name + "_left_heatmap.png")
 
 
-
-heatmap, xedges, yedges = np.histogram2d(y_right, x_right, bins=50)
-extent = [ yedges[0], yedges[-1], xedges[0], xedges[-1]]
-plt.clf()
-plt.imshow(heatmap, extent=extent)
-cb = plt.colorbar()
-cb.set_label('mean value')
-plt.savefig(sample_name + "_right_heatmap.png")
+if y_right and x_right:
+    heatmap, xedges, yedges = np.histogram2d(y_right, x_right, bins=50)
+    extent = [ yedges[0], yedges[-1], xedges[0], xedges[-1]]
+    plt.clf()
+    plt.imshow(heatmap, extent=extent)
+    cb = plt.colorbar()
+    cb.set_label('mean value')
+    plt.savefig(sample_name + "_right_heatmap.png")
 
 
